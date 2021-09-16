@@ -1,0 +1,4 @@
+.ct_coin:hover {
+  background-clip: #bcd5eb !important;
+  outline: 1px dashed #e9af6e !important;
+}

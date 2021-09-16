@@ -1,0 +1,21 @@
+- Remplacer BTC par une regex
+- Faire en sorte que la regex prenne des coupures de mots
+- Populate la regex via une liste de coins prédéfinie via API
+- Optimiser la liste de coins pour éviter un appel API à chaque page
+
+--- ABOVE IS DONE
+--- TODO :
+
+- Afficher un popup au hover
+- Trouver une API pour le popup (appel au survol seulement)
+- Designer le popup
+    - LOGO - NAME (ticker) - price in USD
+    - 24h VOLUME - MARKET CAP
+    - Summary
+    - 7D / 1Y / ALL price
+    - Social media in footer
+- Trouver un moyen de se faire donate en crypto
+- Traduction ?
+- Analyse pour les adresses 0x
+    - Total en tunes (ou coins ?) sur l'adresse
+    - Transactions récentes
