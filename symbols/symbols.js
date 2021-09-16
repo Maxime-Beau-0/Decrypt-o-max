@@ -54,5 +54,15 @@
     }
   };
 
+  // Fetch symbols and detect it in document, then format text to add a class (necessary for hover event)
   replaceTextInNode(document.body);
+  // Insert popup
+  fetch(chrome.runtime.getURL("/symbols/popup.html"))
+    .then((response) => response.text())
+    .then((html) => {
+      document.body.insertAdjacentHTML('beforeend', html);
+    })
+    .catch((error) => {
+      console.error('Extension : Error trying to fetch / parse popup.html', error)
+    });
 })();
