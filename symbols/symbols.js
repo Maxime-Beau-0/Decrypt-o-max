@@ -3,20 +3,20 @@
     node.nodeType == Element.TEXT_NODE &&
     node.nodeName == "#text" &&
     (node.parentNode == null ||
-      (node.parentNode.tagName != "SCRIPT" &&
-        node.parentNode.tagName != "STYLE"));
+      (node.parentNode.tagName.toLowerCase() != "script" &&
+        node.parentNode.tagName.toLowerCase() != "style"));
 
   const symbols = await fetchTopic("symbols");
   let regexpSymbols;
   try {
     regexpSymbols = new RegExp(
-      `\\b(${symbols.map(escapeRegExp).join("|")})\\b`,
+      `\\b(${symbols.map((coin) => coin.symbol).map(escapeRegExp).join("|")})\\b`,
       "gmi"
     );
   } catch (e) {
     // In case there is now too many tokens, take the first 9k
     regexpSymbols = new RegExp(
-      `\\b(${symbols.slice(0, 9000).map(escapeRegExp).join("|")})\\b`,
+      `\\b(${symbols.slice(0, 9000).map((coin) => coin.symbol).map(escapeRegExp).join("|")})\\b`,
       "gmi"
     );
   }
@@ -32,18 +32,20 @@
         // because we're going to split the current node on each iteration, and only keep the beginning
         for (const match of Array.from(matches).reverse()) {
           // Get useful variables
-          const textFound = match[0];
+          const symbolFound = match[0];
           const index = match.index;
 
-          // Create a new span element with our class and the textFound (and put it where the text was)
+          // Create a new span element with our class & the symbolFound as attribute & text
           const newElement = document.createElement("span");
-          newElement.classList = "ct_coin";
-          newElement.appendChild(document.createTextNode(textFound));
+          newElement.classList = "ct_symbol";
+          newElement.setAttribute('ct_symbol', symbolFound);
+          newElement.setAttribute('ct_coin_id', symbols.find((coin) => coin.symbol.toLowerCase() === symbolFound.toLowerCase()).id);
+          newElement.appendChild(document.createTextNode(symbolFound));
           // Remove text at this specific position - .replace() would not as it could replace another occurence of this string
           node.textContent = `${node.textContent.slice(
             0,
             index
-          )}${node.textContent.slice(index + textFound.length)}`;
+          )}${node.textContent.slice(index + symbolFound.length)}`;
           // Insert the new span
           node.parentNode.insertBefore(newElement, node.splitText(index));
         }
@@ -56,13 +58,22 @@
 
   // Fetch symbols and detect it in document, then format text to add a class (necessary for hover event)
   replaceTextInNode(document.body);
-  // Insert popup
-  fetch(chrome.runtime.getURL("/symbols/popup.html"))
-    .then((response) => response.text())
-    .then((html) => {
-      document.body.insertAdjacentHTML('beforeend', html);
-    })
-    .catch((error) => {
-      console.error('Extension : Error trying to fetch / parse popup.html', error)
-    });
+  
+  const boxId = "ct_popup_symbol";
+  const boxSelector = `#${boxId}`;
+  const box = Boundary.createBox(boxId);
+  Boundary.loadBoxCSS(boxSelector, chrome.runtime.getURL("symbols/symbols.css"));
+  const response = await fetch(chrome.runtime.getURL("symbols/popup.html"));
+  const popupContent = await response.text();
+  Boundary.rewriteBox(boxSelector, popupContent);
+  $(".ct_symbol").on("mouseover", async (event) => {
+      const symbolElement = event.target;
+      const coinId = symbolElement.getAttribute('ct_coin_id');
+      const coinInformations = await fetchTopic('coin', { forceRefresh: true, data: { coinId } });
+      console.log("🚀 ~ file: symbols.js ~ line 73 ~ $ ~ coinInformations", coinInformations);
+      $(boxSelector).appendTo(event.target);
+      $(boxSelector).show();
+  }).on("mouseout", function() {
+      $(boxSelector).hide();
+  });
 })();

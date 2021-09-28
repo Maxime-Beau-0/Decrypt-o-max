@@ -1,8 +1,8 @@
-.ct_symbol:hover {
+span.ct_symbol:hover {
   background-clip: #bcd5eb !important;
   outline: 1px dashed #e9af6e !important;
 }
 
-.ct_popup_symbol {
-  display: none;
+span.ct_symbol {
+  position: relative;
 }

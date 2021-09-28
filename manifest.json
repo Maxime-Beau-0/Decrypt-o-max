@@ -10,22 +10,30 @@
   "permissions": ["activeTab", "declarativeContent", "storage"],
   "host_permissions": ["https://api.coingecko.com/api/v3/*"],
 
-  "web_accessible_resources": [{
-    "resources": [ "symbols/popup.html" ],
-    "matches": [ "http://*/*", "https://*/*" ]
-  }],
-
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "css": ["symbols/symbols.css"],
+      "css": ["libs/boundary/boundary.css", "symbols/container.css", "symbols/symbols.css"],
       "js": [
+        "libs/boundary/jquery.js",
+        "libs/boundary/boundary.js",
         "utils/storage.js",
         "utils/fetch.js",
         "utils/regexp.js",
         "symbols/symbols.js"
       ],
       "run_at": "document_end"
+    }
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "libs/boundary/boundary-extra.css",
+        "symbols/symbols.css",
+        "symbols/popup.html"
+      ],
+      "matches": ["http://*/*", "https://*/*"]
     }
   ],
 
