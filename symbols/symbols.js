@@ -130,30 +130,30 @@
         displayPopup(elementHovered);
         return;
       }
-      const nodesAdded = traverseNode(elementHovered);
-      // Wait until nodes are added to DOM, and display popup if it's hovered
+      // Traverse node & wait until nodes are added to DOM, and display popup if it's hovered
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
           if (!mutation.addedNodes) return
-          const hoveredNodes = document.querySelectorAll(":hover");
-          const elementHovered = Array.from(hoveredNodes.values()).pop();
-          if(isSymbolNode(elementHovered)) {
-            displayPopup(elementHovered);
-            return;
-          }
+          // .querySelectorAll with hover would not be refreshed yet & no event can be catch, wait 10ms... no other solution found
+          setTimeout(() => {
+            const hoveredNodes = document.querySelectorAll(":hover");
+            const elementHovered = Array.from(hoveredNodes.values()).pop();
+            if(isSymbolNode(elementHovered)) {
+              displayPopup(elementHovered);
+            }
+          }, 10);
         })
       });
       observer.observe(elementHovered, {
         childList: true,
         subtree: true,
         attributes: false,
-        characterData: false
       })
+      traverseNode(elementHovered);
       // Stop observing after 500ms to avoid displaying a popup too late
       setTimeout(() => {
         observer.disconnect();
-      }, 500);
-      hidePopup();
+      }, 50000);
     }
   });
 })();
