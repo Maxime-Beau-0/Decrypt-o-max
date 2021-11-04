@@ -1,5 +1,6 @@
 // background.js
 const fetchSymbols = async () => {
+  console.info('Fetching symbols from coingecko api...');
   const url = "https://api.coingecko.com/api/v3/coins/list";
   try {
     const response = await fetch(url);
@@ -13,6 +14,8 @@ const fetchSymbols = async () => {
   }
 };
 const fetchCoin = async (coinId) => {
+  console.info(`Fetching coin ${coinId} from coingecko api...`);
+  // Ignore some keyword (see coingecko api specs)
   if(coinId === "list" || coinId === "markets" || coinId === "categories") {
     return null;
   }
