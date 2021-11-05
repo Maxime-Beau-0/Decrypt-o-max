@@ -59,10 +59,10 @@ body {
   bottom: 12%;
   left: 25%;
 }
+
 .btn {
   transform: translateY(0px);
   transition: 0.3s linear;
-  background: #809fff;
   border-radius: 5px;
   position: relative;
   overflow: hidden;
@@ -76,7 +76,6 @@ body {
 
 .btn:hover {
   transform: translateY(-6px);
-  background: #1a66ff;
 }
 
 .btn span {
@@ -87,6 +86,7 @@ body {
   font-size: 1.2em;
   margin: 0;
 }
+
 .btn .price,
 .chart-line {
   background: #333;
@@ -136,7 +136,6 @@ body {
   line-height: 1.8;
   text-align: left;
   font-size: 105%;
-  cursor: no-drop;
   color: #fff;
   height: 100%;
   width: 100%;
