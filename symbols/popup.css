@@ -115,13 +115,11 @@ body {
 
 .product-image {
   transition: all 0.3s ease-out;
-  display: inline-block;
   position: relative;
   overflow: hidden;
   height: 100%;
   float: right;
   width: 45%;
-  display: inline-block;
 }
 
 #container .right-image {
