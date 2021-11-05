@@ -182,7 +182,7 @@
       }
       // Traverse node & wait until nodes are added to DOM, and display popup if it's hovered
       const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
+        for(const mutation of mutations) {
           if (!mutation.addedNodes) return;
           // .querySelectorAll with hover would not be refreshed yet & no event can be catch, wait 10ms... no other solution found
           setTimeout(() => {
@@ -194,7 +194,8 @@
               hidePopup();
             }
           }, 10);
-        });
+          break;
+        }
       });
       observer.observe(elementHovered, {
         childList: true,
