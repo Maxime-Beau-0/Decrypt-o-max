@@ -29,8 +29,9 @@
   "web_accessible_resources": [
     {
       "resources": [
+        "images/splash.jpg",
         "libs/boundary/boundary-extra.css",
-        "symbols/symbols.css",
+        "symbols/popup.css",
         "symbols/popup.html"
       ],
       "matches": ["http://*/*", "https://*/*"]
