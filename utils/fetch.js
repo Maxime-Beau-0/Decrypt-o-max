@@ -7,7 +7,7 @@ const fetchTopic = async (topic, options) => {
   
   return new Promise((resolve, reject) => {
     if (topicInStorage && !forceRefresh) {
-      console.log("Extension : Fetched from cache - ", topicInStorage);
+      console.info("Extension : Fetched from cache - ", topicInStorage);
       return resolve(topicInStorage);
     }
     chrome.runtime.sendMessage({ topic, data }, (messageResponse) => {

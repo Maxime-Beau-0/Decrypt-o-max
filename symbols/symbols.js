@@ -113,7 +113,6 @@
     );
     const response = await fetch(chrome.runtime.getURL("symbols/popup.html"));
     const popupContent = await response.text();
-    console.log("HeRE", popupContent);
     Boundary.rewriteBox(boxSelector, popupContent);
   };
   createSymbolPopup();
@@ -124,13 +123,12 @@
       data: { coinId },
     });
     console.info(
-      "CryptoTracker - displaying coin informations : ",
+      "CryptoTracker - displaying coin informations : ", coinId,
       coinInformations
     );
     if (!coinInformations) {
       return;
     }
-    console.log("#ct_title", $("#ct_title"));
     // Name & description
     Boundary.rewrite("#ct_coin_name", coinInformations.name);
     const description = $($.parseHTML(coinInformations.description.en)).text();
@@ -139,9 +137,7 @@
     // Price & market informations
     Boundary.rewrite("#ct_coin_current_price", "$"+coinInformations.market_data.current_price.usd);
     Boundary.rewrite("#ct_coin_change_24h", Math.round(coinInformations.market_data.price_change_percentage_24h * 100) / 100+"%");
-    console.log('Here', coinInformations.market_data.price_change_percentage_24h > 0 ? '#7ab52b' : '#f44336', $("#ct_coin_change_24h").parent())
     Boundary.find("#ct_coin_change_24h").parent().css('background-color', coinInformations.market_data.price_change_percentage_24h > 0 ? '#7ab52b' : '#f44336');
-
     Boundary.rewrite("#ct_coin_marketcap", "$"+coinInformations.market_data.market_cap.usd);
     Boundary.rewrite("#ct_coin_ath", "$"+coinInformations.market_data.ath.usd);
     Boundary.rewrite("#ct_coin_atl", "$"+coinInformations.market_data.atl.usd);
