@@ -1,8 +1,9 @@
-span.ct_symbol:hover {
-  background-clip: #bcd5eb !important;
-  outline: 1px #524c45 !important;
-}
-
 span.ct_symbol {
-  position: relative;
+  position: relative !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: fit-content !important;
+  border: none !important;
 }
