@@ -131,23 +131,49 @@
     }
     // Name & description
     Boundary.rewrite("#ct_coin_name", coinInformations.name);
+    Boundary.rewrite("#ct_coin_symbol", "("+coinInformations.symbol+")");
     const description = $($.parseHTML(coinInformations.description.en)).text();
     Boundary.rewrite("#ct_coin_description", description);
     Boundary.find("#ct_coin_description").attr('title', description);
     // Price & market informations
     Boundary.rewrite("#ct_coin_current_price", "$"+coinInformations.market_data.current_price.usd);
     Boundary.rewrite("#ct_coin_change_24h", Math.round(coinInformations.market_data.price_change_percentage_24h * 100) / 100+"%");
-    Boundary.find("#ct_coin_change_24h").parent().css('background-color', coinInformations.market_data.price_change_percentage_24h > 0 ? '#7ab52b' : '#f44336');
+    Boundary.find("#ct_coin_change_24h").css('color', coinInformations.market_data.price_change_percentage_24h > 0 ? '#7ab52b' : '#f44336');
     Boundary.rewrite("#ct_coin_marketcap", "$"+coinInformations.market_data.market_cap.usd);
     Boundary.rewrite("#ct_coin_ath", "$"+coinInformations.market_data.ath.usd);
     Boundary.rewrite("#ct_coin_atl", "$"+coinInformations.market_data.atl.usd);
+    // Links & social media
+    const homepage = coinInformations.links.homepage.length > 0 ? coinInformations.links.homepage[0] : null;
+    if(homepage) Boundary.find("#ct_link_homepage").attr('href', homepage).show();
+    else Boundary.find("#ct_link_homepage").hide();
+    const subreddit = coinInformations.links.subreddit_url || null;
+    if(subreddit) Boundary.find("#ct_link_reddit").attr('href', subreddit).show();
+    else Boundary.find("#ct_link_reddit").hide();
+    const twitterHandle = coinInformations.links.twitter_screen_name || null;
+    if(twitterHandle) Boundary.find("#ct_link_twitter").attr('href', "https://twitter.com/"+twitterHandle).show();
+    else Boundary.find("#ct_link_twitter").hide();
+    const facebookUsername = coinInformations.links.facebook_username || null;
+    if(facebookUsername) Boundary.find("#ct_link_facebook").attr('href', "https://facebook.com/"+facebookUsername).show();
+    else Boundary.find("#ct_link_facebook").hide();
+    const telegramIdentifier = coinInformations.links.telegram_channel_identifier || null;
+    if(telegramIdentifier) Boundary.find("#ct_link_telegram").attr('href', "https://t.me/"+telegramIdentifier).show();
+    else Boundary.find("#ct_link_telegram").hide();
+    const github = coinInformations.links.repos_url.github.length > 0 ? coinInformations.links.repos_url.github[0] : null;
+    if(github) Boundary.find("#ct_link_github").attr('href', github).show();
+    else Boundary.find("#ct_link_github").hide();
+    Boundary.find("#ct_link_coinmarketcap").attr('href', "https://coinmarketcap.com/currencies/"+coinInformations.id).show();
+    Boundary.find("#ct_link_coingecko").attr('href', "https://www.coingecko.com/en/coins/"+coinInformations.id).show();
+    const explorer = coinInformations.links.blockchain_site.length > 0 ? 
+      coinInformations.links.blockchain_site.find(link => link.includes('etherscan.io') || link.includes('bscscan.com')) || coinInformations.links.blockchain_site[0] : null;
+    if(explorer) Boundary.find("#ct_link_explorer").attr('href', explorer).show();
+    else Boundary.find("#ct_link_explorer").hide();
     // Logo & images
-    const image = Boundary.find("#ct_coin_image");
-    image.attr('src', chrome.runtime.getURL('images/splash.jpg'));
     if(coinInformations.image.small) {
       const logo = Boundary.find("#ct_coin_logo");
       logo.attr('src', coinInformations.image.small);
     }
+    const image = Boundary.find(".market-data");
+    image.css('background-image', "url("+chrome.runtime.getURL('images/splash.jpg')+")");
   };
 
   const displayPopup = async (symbolNode) => {
