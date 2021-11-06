@@ -2,7 +2,6 @@
   background-color: white;
   height: 350px;
   width: 700px;
-  border-radius: 4px;
   display: none;
   position: absolute;
   z-index: 9999;
@@ -10,6 +9,6 @@
   overflow-y: hidden;
 }
 
-.shadow {
+#ct_popup_symbol.shadow {
     box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
 }
