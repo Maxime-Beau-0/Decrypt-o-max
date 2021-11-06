@@ -131,20 +131,23 @@ body {
    Right panel
 */
 
-.market-data {
+.market {
+  font-family: "EB Garamond", serif;
+  text-align: center;
+  font-size: 18px;
+  color: #d8d8d8;
   transition: all 0.3s ease-out;
   position: relative;
   overflow: hidden;
   height: 100%;
   float: right;
   width: 50%;
-  color: #fff;
   padding: 15px;
   box-sizing: border-box;
   background-position-x: center;
 }
 
-#container .market-data a {
+#container .market a {
   font-size: 30px;
   color: inherit;
   text-decoration: inherit; /* no underline */
@@ -152,27 +155,64 @@ body {
   height: 30px;
   text-align: center;
 }
-#container .market-data a:hover {
+#container .market a:hover {
   color: #f4511e;
   opacity: 0.6;
   transition: 0.3s;
 }
-#container .market-data a.link-coinmarketcap {
+#container .market a.link-coinmarketcap {
   position: absolute;
   bottom: 15px;
   right: 60px;
 }
-#container .market-data a.link-coingecko {
+#container .market a.link-coingecko {
   position: absolute;
   bottom: 15px;
   right: 15px;
 }
-#container .market-data a.link-explorer {
+#container .market a.link-explorer {
   position: absolute;
   bottom: 15px;
   right: 60px;
 }
 
+#container .market .market-informations {
+  display:flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  height: 300px;
+}
+
+#container .market .market-informations .col {
+  display:flex;
+  flex-direction: column;
+}
+
+#container .market .market-informations .col:first-of-type {
+  text-align: left;
+  font-weight: bold;
+  width: 45%;
+}
+#container .market .market-informations .col:last-of-type {
+  text-align: right;
+  width: 55%;
+}
+
+#container .market .market-informations .col:first-of-type .cell {
+  border-right: 1px dashed #7d7d7d;
+}
+#container .market .market-informations .col .cell {
+  border-bottom: 1px dashed #7d7d7d;
+}
+#container .market .market-informations .col .cell:last-of-type {
+  border-bottom: none;
+}
+
+#container .market .market-informations .cell {
+  padding: 10px;
+}
+
+/**
 .info {
   background: rgba(27, 26, 26, 0.9);
   font-family: "Bree Serif", serif;
@@ -192,14 +232,14 @@ body {
 .info h2 {
   text-align: center;
 }
-/*
+
 .market-data:hover .info {
   transform: translateX(0);
 }
-*/
 .info ul li {
   transition: 0.2s ease;
 }
 .info ul li:hover {
   transform: translateX(15px) scale(1.1);
 }
+*/

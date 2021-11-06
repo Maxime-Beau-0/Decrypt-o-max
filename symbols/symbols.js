@@ -1,4 +1,14 @@
 (async () => {
+  const formatToUsd = (number) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', currencyDisplay: 'narrowSymbol', minimumFractionDigits:0, maximumFractionDigits:9 }).format(number)
+  } 
+  const formatToUsPercent = (number) => {
+    return new Intl.NumberFormat('en-US', { style: 'percent', minimumFractionDigits:0, maximumFractionDigits:2 }).format(number / 100)
+  } 
+  const formatToUsNumber = (number) => {
+    return new Intl.NumberFormat('en-US', { minimumFractionDigits:0, maximumFractionDigits:9 }).format(number)
+  } 
+
   /**
    * @param {*} node
    * @returns boolean - true if node is a text element not inside a script or style tag
@@ -136,12 +146,15 @@
     Boundary.rewrite("#ct_coin_description", description);
     Boundary.find("#ct_coin_description").attr('title', description);
     // Price & market informations
-    Boundary.rewrite("#ct_coin_current_price", "$"+coinInformations.market_data.current_price.usd);
-    Boundary.rewrite("#ct_coin_change_24h", Math.round(coinInformations.market_data.price_change_percentage_24h * 100) / 100+"%");
+    Boundary.rewrite("#ct_coin_current_price", formatToUsd(coinInformations.market_data.current_price.usd));
+    Boundary.rewrite("#ct_coin_change_24h", formatToUsPercent(coinInformations.market_data.price_change_percentage_24h));
     Boundary.find("#ct_coin_change_24h").css('color', coinInformations.market_data.price_change_percentage_24h > 0 ? '#7ab52b' : '#f44336');
-    Boundary.rewrite("#ct_coin_marketcap", "$"+coinInformations.market_data.market_cap.usd);
-    Boundary.rewrite("#ct_coin_ath", "$"+coinInformations.market_data.ath.usd);
-    Boundary.rewrite("#ct_coin_atl", "$"+coinInformations.market_data.atl.usd);
+    Boundary.rewrite("#ct_coin_marketcap", formatToUsd(coinInformations.market_data.market_cap.usd));
+    Boundary.rewrite("#ct_coin_ath", formatToUsd(coinInformations.market_data.ath.usd));
+    Boundary.rewrite("#ct_coin_atl", formatToUsd(coinInformations.market_data.atl.usd));
+    Boundary.rewrite("#ct_coin_24h_volume", formatToUsd(coinInformations.market_data.total_volume.usd));
+    Boundary.rewrite("#ct_coin_current_supply", coinInformations.market_data.circulating_supply ? formatToUsNumber(coinInformations.market_data.circulating_supply) : "-");
+    Boundary.rewrite("#ct_coin_max_supply", coinInformations.market_data.total_supply || coinInformations.market_data.max_supply ? formatToUsNumber(coinInformations.market_data.total_supply || coinInformations.market_data.max_supply) : "-");
     // Links & social media
     const homepage = coinInformations.links.homepage.length > 0 ? coinInformations.links.homepage[0] : null;
     if(homepage) Boundary.find("#ct_link_homepage").attr('href', homepage).show();
@@ -172,7 +185,7 @@
       const logo = Boundary.find("#ct_coin_logo");
       logo.attr('src', coinInformations.image.small);
     }
-    const image = Boundary.find(".market-data");
+    const image = Boundary.find("#ct_market");
     image.css('background-image', "url("+chrome.runtime.getURL('images/splash.jpg')+")");
   };
 
