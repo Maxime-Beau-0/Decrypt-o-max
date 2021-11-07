@@ -182,6 +182,7 @@
     else Boundary.find("#ct_link_github").hide();
     Boundary.find("#ct_link_coinmarketcap").attr('href', "https://coinmarketcap.com/currencies/"+coinInformations.id).show();
     Boundary.find("#ct_link_coingecko").attr('href', "https://www.coingecko.com/en/coins/"+coinInformations.id).show();
+    Boundary.find("#ct_logo_coingecko").attr('src', chrome.runtime.getURL('images/coingecko_logo.png')).show();
     const explorer = coinInformations.links.blockchain_site.length > 0 ? 
       coinInformations.links.blockchain_site.find(link => link.includes('etherscan.io') || link.includes('bscscan.com')) || coinInformations.links.blockchain_site[0] : null;
     if(explorer) Boundary.find("#ct_link_explorer").attr('href', explorer).show();
@@ -207,8 +208,8 @@
     const coinId = symbolNode.getAttribute("ct_coin_id");
     // Move it to the right location (bottom-right of the current node)
     const $el = $(symbolNode);
-    const bottom = $el.offset().top + $el.outerHeight(true);
-    const right = $el.offset().left + $el.outerWidth(true);
+    const bottom = Math.min($el.offset().top + $el.outerHeight(true), $(window).scrollTop() + document.documentElement.clientHeight - 350)
+    const right = Math.min($el.offset().left + $el.outerWidth(true), $(window).scrollLeft() + document.documentElement.clientWidth - 700)
     $(boxSelector).css({ top: bottom, left: right });
     await populatePopup(coinId);
     // Once everything is over, we can safely display popup
