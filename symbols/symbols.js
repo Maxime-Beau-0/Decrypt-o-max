@@ -1,4 +1,7 @@
 (async () => {
+  /***************************
+   * START OF UTILITY METHODS
+   **************************/
   const formatToUsd = (number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', currencyDisplay: 'narrowSymbol', minimumFractionDigits:0, maximumFractionDigits:9 }).format(number)
   } 
@@ -26,8 +29,23 @@
     return Array.from(node.classList.values()).includes("ct_symbol");
   };
 
+  const displayLoadingCursor = (node) => {
+    $('body').addClass('ct_waiting');
+    $(node).addClass('ct_waiting');
+  }
+
+  const hideLoadingCursor = (node) => {
+    $('body').removeClass('ct_waiting');
+    $(node).removeClass('ct_waiting');
+  }
+
+  /*************************
+   * END OF UTILITY METHODS
+   ************************/
+
+
   // Get all symbols & create a regexp from it
-  const symbols = await fetchTopic("symbols");
+  const symbols = (await fetchTopic("symbols")).filter(coin => !coin.id.startsWith('binance-peg'));
   let regexpSymbols;
   try {
     regexpSymbols = new RegExp(
@@ -123,15 +141,6 @@
     Boundary.rewriteBox(boxSelector, popupContent);
   };
   createSymbolPopup();
-  
-  const displayLoadingCursor = (node) => {
-    $('body').addClass('ct_waiting');
-    $(node).addClass('ct_waiting');
-  }
-  const hideLoadingCursor = (node) => {
-    $('body').removeClass('ct_waiting');
-    $(node).removeClass('ct_waiting');
-  }
 
   const populatePopup = async (coinId) => {
     const coinInformations = await fetchTopic("coin", {
