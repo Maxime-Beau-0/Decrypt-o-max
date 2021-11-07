@@ -187,6 +187,7 @@
     }
     const image = Boundary.find("#ct_market");
     image.css('background-image', "url("+chrome.runtime.getURL('images/splash.jpg')+")");
+    return true;
   };
 
   const displayPopup = async (symbolNode) => {
@@ -194,12 +195,15 @@
       console.warn("Trying to display popup on a non-symbol node...");
       return;
     }
+    // Get coin id and populate popup based on these informations
     const coinId = symbolNode.getAttribute("ct_coin_id");
-    populatePopup(coinId);
+    await populatePopup(coinId);
+    // Move it to the right location (bottom-right of the current node)
     const $el = $(symbolNode);
     const bottom = $el.offset().top + $el.outerHeight(true);
     const right = $el.offset().left + $el.outerWidth(true);
     $(boxSelector).css({ top: bottom, left: right });
+    // Once everything is over, we can safely display popup
     $(boxSelector).show();
   };
 
@@ -207,11 +211,12 @@
     $(boxSelector).hide();
   };
 
-  // Listener on CTRL key down
+  // Listener on CTRL key down to display popup, ESC to hide it
   $(document).on("keydown", async (e) => {
     if (e.which == 27) {
       hidePopup();
     } else if (e.which == 17) {
+      hidePopup();
       const hoveredNodes = document.querySelectorAll(":hover");
       const elementHovered = Array.from(hoveredNodes.values()).pop();
       // If it's a symbol node, display popup. Otherwise traverse it to add symbol nodes just in case
@@ -229,8 +234,6 @@
             const elementHovered = Array.from(hoveredNodes.values()).pop();
             if (isSymbolNode(elementHovered)) {
               displayPopup(elementHovered);
-            } else {
-              hidePopup();
             }
           }, 10);
           break;

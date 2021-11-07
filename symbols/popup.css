@@ -37,7 +37,7 @@ body {
   position: relative;
   margin: 0;
   height: 40px;
-  max-width: 40px;
+  width: 40px;
 }
 
 #container h1 {
@@ -93,7 +93,7 @@ body {
   text-align: center;
 }
 #container .product-details .social-media a:hover {
-  color: #f4511e;
+  color: hsl(106, 53%, 51%);
   opacity: 0.6;
   transition: 0.3s;
 }
@@ -156,7 +156,7 @@ body {
   text-align: center;
 }
 #container .market a:hover {
-  color: #f4511e;
+  color: hsl(106, 53%, 51%);;
   opacity: 0.6;
   transition: 0.3s;
 }
