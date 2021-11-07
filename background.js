@@ -1,15 +1,15 @@
 // background.js
-const fetchSymbols = async () => {
-  console.info('Fetching symbols from coingecko api...');
+const fetchCoins = async () => {
+  console.info('Fetching coins from coingecko api...');
   const url = "https://api.coingecko.com/api/v3/coins/list";
   try {
     const response = await fetch(url);
     const data = await response.text();
     const coins = JSON.parse(data);
-    // console.info('Extension cryptoTracker : ', symbols.length, 'symbols found = ', symbols)
+    // console.info('Extension cryptoTracker : ', coins.length, 'coins found = ', coins)
     return coins;
   } catch (e) {
-    console.error("Extension cryptoTracker error in fetchSymbols : ", e);
+    console.error("Extension cryptoTracker error in fetchCoins : ", e);
     return null;
   }
 };
@@ -34,9 +34,9 @@ const fetchCoin = async (coinId) => {
 
 // Receive messages and call corresponding methods
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.topic == "symbols") {
-    fetchSymbols().then((symbols) => {
-      sendResponse(symbols);
+  if (request.topic == "coins") {
+    fetchCoins().then((coins) => {
+      sendResponse(coins);
     });
   }
   if (request.topic == "coin") {
