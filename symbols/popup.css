@@ -6,6 +6,10 @@ body {
   overflow: hidden;
 }
 
+body.waiting * {
+  cursor: progress !important;
+}
+
 #container {
   box-shadow: 0 15px 30px 1px grey;
   background: rgba(255, 255, 255, 0.9);
@@ -167,12 +171,12 @@ body {
 }
 #container .market a.link-coingecko {
   position: absolute;
-  bottom: 15px;
+  bottom: 20px;
   right: 15px;
 }
 #container .market a.link-explorer {
   position: absolute;
-  bottom: 15px;
+  bottom: 20px;
   right: 60px;
 }
 

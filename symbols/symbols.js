@@ -107,9 +107,6 @@
     return nodesAffected;
   };
 
-  // Fetch symbols and detect it in document, then format text to add a class (necessary for hover event)
-  // traverseNode(document.body);
-
   /**
    * Create an empty & invisible popup, completely separated from the current page to avoid style conflicts
    */
@@ -126,6 +123,13 @@
     Boundary.rewriteBox(boxSelector, popupContent);
   };
   createSymbolPopup();
+  
+  const displayLoadingCursor = () => {
+    $('body').addClass('waiting');
+  }
+  const hideLoadingCursor = () => {
+    $('body').removeClass('waiting');
+  }
 
   const populatePopup = async (coinId) => {
     const coinInformations = await fetchTopic("coin", {
@@ -195,15 +199,18 @@
       console.warn("Trying to display popup on a non-symbol node...");
       return;
     }
+    // Display loading
+    displayLoadingCursor();
     // Get coin id and populate popup based on these informations
     const coinId = symbolNode.getAttribute("ct_coin_id");
-    await populatePopup(coinId);
     // Move it to the right location (bottom-right of the current node)
     const $el = $(symbolNode);
     const bottom = $el.offset().top + $el.outerHeight(true);
     const right = $el.offset().left + $el.outerWidth(true);
     $(boxSelector).css({ top: bottom, left: right });
+    await populatePopup(coinId);
     // Once everything is over, we can safely display popup
+    hideLoadingCursor();
     $(boxSelector).show();
   };
 
@@ -219,6 +226,7 @@
       hidePopup();
       const hoveredNodes = document.querySelectorAll(":hover");
       const elementHovered = Array.from(hoveredNodes.values()).pop();
+      displayLoadingCursor();
       // If it's a symbol node, display popup. Otherwise traverse it to add symbol nodes just in case
       if (isSymbolNode(elementHovered)) {
         displayPopup(elementHovered);
@@ -227,7 +235,7 @@
       // Traverse node & wait until nodes are added to DOM, and display popup if it's hovered
       const observer = new MutationObserver((mutations) => {
         for(const mutation of mutations) {
-          if (!mutation.addedNodes) return;
+          if (!mutation.addedNodes) continue;
           // .querySelectorAll with hover would not be refreshed yet & no event can be catch, wait 10ms... no other solution found
           setTimeout(() => {
             const hoveredNodes = document.querySelectorAll(":hover");
@@ -238,6 +246,7 @@
           }, 10);
           break;
         }
+        hideLoadingCursor();
       });
       observer.observe(elementHovered, {
         childList: true,
@@ -248,7 +257,8 @@
       // Stop observing after 500ms to avoid displaying a popup too late
       setTimeout(() => {
         observer.disconnect();
-      }, 50000);
+        hideLoadingCursor();
+      }, 500);
     }
   });
 })();
