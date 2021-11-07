@@ -2,88 +2,47 @@
   /***************************
    * START OF UTILITY METHODS
    **************************/
-  const formatToUsd = (number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', currencyDisplay: 'narrowSymbol', minimumFractionDigits:0, maximumFractionDigits:9 }).format(number)
-  } 
-  const formatToUsPercent = (number) => {
-    return new Intl.NumberFormat('en-US', { style: 'percent', minimumFractionDigits:0, maximumFractionDigits:2 }).format(number / 100)
-  } 
-  const formatToUsNumber = (number) => {
-    return new Intl.NumberFormat('en-US', { minimumFractionDigits:0, maximumFractionDigits:9 }).format(number)
-  } 
-
-  /**
-   * @param {*} node
-   * @returns boolean - true if node is a text element not inside a script or style tag
-   */
-  const isTextNode = (node) =>
-    node &&
-    node.nodeType == Element.TEXT_NODE &&
-    node.nodeName == "#text" &&
-    (node.parentNode == null ||
-      (node.parentNode.tagName.toLowerCase() != "script" &&
-        node.parentNode.tagName.toLowerCase() != "style"));
-
-  const isSymbolNode = (node) => {
-    if (!node) return false;
-    return Array.from(node.classList.values()).includes("ct_symbol");
-  };
 
   const displayLoadingCursor = (node) => {
-    $('body').addClass('ct_waiting');
-    $(node).addClass('ct_waiting');
-  }
+    $("body").addClass("ct_waiting");
+    if (node) $(node).addClass("ct_waiting");
+  };
 
   const hideLoadingCursor = (node) => {
-    $('body').removeClass('ct_waiting');
-    $(node).removeClass('ct_waiting');
-  }
+    $("body").removeClass("ct_waiting");
+    if (node) $(node).removeClass("ct_waiting");
+  };
 
   /*************************
    * END OF UTILITY METHODS
    ************************/
 
-
-  // Get all symbols & create a regexp from it
-  const symbols = (await fetchTopic("symbols")).filter(coin => !coin.id.startsWith('binance-peg'));
-  let regexpSymbols;
-  let regexpNames;
-  try {
-    regexpSymbols = new RegExp(
-      `\\b(${symbols
-        .map((coin) => coin.symbol)
-        .map(escapeRegExp)
-        .join("|")})\\b`,
-      "gmi"
-    );
-    regexpNames = new RegExp(
-      `\\b(${symbols
-        .map((coin) => coin.name)
-        .map(escapeRegExp)
-        .join("|")})\\b`,
-      "gmi"
-    );
-  } catch (e) {
-    // In case there is now too many tokens, take the first 9k
-    regexpSymbols = new RegExp(
-      `\\b(${symbols
-        .slice(0, 9000)
-        .map((coin) => coin.symbol)
-        .map(escapeRegExp)
-        .join("|")})\\b`,
-      "gmi"
-    );
-    // In case there is now too many tokens, take the first 9k
-    regexpNames = new RegExp(
-      `\\b(${symbols
-        .slice(0, 9000)
-        .map((coin) => coin.name)
-        .map(escapeRegExp)
-        .join("|")})\\b`,
-      "gmi"
+  // Get all coins & create regexp from it
+  const coins = (await fetchTopic("coins")).filter(
+    (coin) => !coin.id.startsWith("binance-peg")
+  );
+  const regexps = [];
+  // List of names then list of symbols
+  let searchTerms = coins.map((coin) => coin.name.toLowerCase()).map(escapeRegExp);
+  searchTerms.push(...coins.map((coin) => coin.symbol.toLowerCase()).map(escapeRegExp));
+  const uniqueSearchTerms = [...new Set(searchTerms)];
+  // Create an array of regexps from our search terms
+  for (let i = 0; i < uniqueSearchTerms.length; i += 2000) {
+    regexps.push(
+      new RegExp(
+        `\\b(${uniqueSearchTerms.slice(i, i + 2000).join("|")})\\b`,
+        "gmi"
+      )
     );
   }
 
+  /**
+   * Method used to surround a "text" at "index" in "node" with a span element
+   * @param {*} node
+   * @param {*} index
+   * @param {*} text
+   * @returns
+   */
   const injectSpanAroundText = (node, index, text) => {
     // Check that this text is not already surrounded by our injected span
     if (isSymbolNode(node.parentNode)) {
@@ -95,8 +54,11 @@
     newElement.setAttribute("ct_symbol", text);
     newElement.setAttribute(
       "ct_coin_id",
-      symbols.find((coin) => coin.symbol.toLowerCase() === text.toLowerCase() || coin.name.toLowerCase() === text.toLowerCase())
-        .id
+      coins.find(
+        (coin) =>
+          coin.symbol.toLowerCase() === text.toLowerCase() ||
+          coin.name.toLowerCase() === text.toLowerCase()
+      ).id
     );
     newElement.appendChild(document.createTextNode(text));
     // Remove text at this specific position - .replace() would not as it could replace another occurence of this string
@@ -110,9 +72,9 @@
   };
 
   /**
-   * Go through a node & its children (recursively) & inject an html element around all symbols found in text nodes
+   * Go through a node & its children (recursively) & inject an html element around all coins found in text nodes
    * @param {*} parentNode node to traverse
-   * @returns number of symbols found
+   * @returns number of coins found
    */
   const traverseNode = (parentNode) => {
     let nodesAffected = [];
@@ -126,11 +88,15 @@
         continue;
       }
       // Get all names & symbols in this node's text
-      const matches = Array.from(node.textContent.matchAll(regexpSymbols));
-      matches.push(...Array.from(node.textContent.matchAll(regexpNames)));
-      // Iterate in reverse order (symbols at the end of the node first)
+      const matches = [];
+      for (const regexp of regexps) {
+        matches.push(...Array.from(node.textContent.matchAll(regexp)));
+      }
+      // Iterate in reverse order (terms at the end of the node first)
       // because we're going to split the current node on each iteration, and only keep the beginning
-      for (const match of matches.sort((match1, match2) => match1.index > match2.index)) {
+      for (const match of matches.sort((match1, match2) =>
+        match1.index > match2.index ? -1 : 1
+      )) {
         // Get useful variables
         const symbolFound = match[0];
         const index = match.index;
@@ -149,7 +115,7 @@
   const boxId = "ct_popup_symbol";
   const boxSelector = `#${boxId}`;
   const createSymbolPopup = async () => {
-    const box = Boundary.createBox(boxId, 'shadow');
+    const box = Boundary.createBox(boxId, "shadow");
     Boundary.loadBoxCSS(
       boxSelector,
       chrome.runtime.getURL("symbols/popup.css")
@@ -166,7 +132,8 @@
       data: { coinId },
     });
     console.info(
-      "CryptoTracker - displaying coin informations : ", coinId,
+      "CryptoTracker - displaying coin informations : ",
+      coinId,
       coinInformations
     );
     if (!coinInformations) {
@@ -174,53 +141,128 @@
     }
     // Name & description
     Boundary.rewrite("#ct_coin_name", coinInformations.name);
-    Boundary.rewrite("#ct_coin_symbol", "("+coinInformations.symbol+")");
+    Boundary.rewrite("#ct_coin_symbol", "(" + coinInformations.symbol + ")");
     const description = $($.parseHTML(coinInformations.description.en)).text();
     Boundary.rewrite("#ct_coin_description", description);
-    Boundary.find("#ct_coin_description").attr('title', description);
+    Boundary.find("#ct_coin_description").attr("title", description);
     // Price & market informations
-    Boundary.rewrite("#ct_coin_current_price", formatToUsd(coinInformations.market_data.current_price.usd));
-    Boundary.rewrite("#ct_coin_change_24h", formatToUsPercent(coinInformations.market_data.price_change_percentage_24h));
-    Boundary.find("#ct_coin_change_24h").css('color', coinInformations.market_data.price_change_percentage_24h > 0 ? '#7ab52b' : '#f44336');
-    Boundary.rewrite("#ct_coin_marketcap", formatToUsd(coinInformations.market_data.market_cap.usd));
-    Boundary.rewrite("#ct_coin_ath", formatToUsd(coinInformations.market_data.ath.usd));
-    Boundary.rewrite("#ct_coin_atl", formatToUsd(coinInformations.market_data.atl.usd));
-    Boundary.rewrite("#ct_coin_24h_volume", formatToUsd(coinInformations.market_data.total_volume.usd));
-    Boundary.rewrite("#ct_coin_current_supply", coinInformations.market_data.circulating_supply ? formatToUsNumber(coinInformations.market_data.circulating_supply) : "-");
-    Boundary.rewrite("#ct_coin_max_supply", coinInformations.market_data.total_supply || coinInformations.market_data.max_supply ? formatToUsNumber(coinInformations.market_data.total_supply || coinInformations.market_data.max_supply) : "-");
+    Boundary.rewrite(
+      "#ct_coin_current_price",
+      formatToUsd(coinInformations.market_data.current_price.usd)
+    );
+    Boundary.rewrite(
+      "#ct_coin_change_24h",
+      formatToUsPercent(
+        coinInformations.market_data.price_change_percentage_24h
+      )
+    );
+    Boundary.find("#ct_coin_change_24h").css(
+      "color",
+      coinInformations.market_data.price_change_percentage_24h > 0
+        ? "#7ab52b"
+        : "#f44336"
+    );
+    Boundary.rewrite(
+      "#ct_coin_marketcap",
+      formatToUsd(coinInformations.market_data.market_cap.usd)
+    );
+    Boundary.rewrite(
+      "#ct_coin_ath",
+      formatToUsd(coinInformations.market_data.ath.usd)
+    );
+    Boundary.rewrite(
+      "#ct_coin_atl",
+      formatToUsd(coinInformations.market_data.atl.usd)
+    );
+    Boundary.rewrite(
+      "#ct_coin_24h_volume",
+      formatToUsd(coinInformations.market_data.total_volume.usd)
+    );
+    Boundary.rewrite(
+      "#ct_coin_current_supply",
+      coinInformations.market_data.circulating_supply
+        ? formatToUsNumber(coinInformations.market_data.circulating_supply)
+        : "-"
+    );
+    Boundary.rewrite(
+      "#ct_coin_max_supply",
+      coinInformations.market_data.total_supply ||
+        coinInformations.market_data.max_supply
+        ? formatToUsNumber(
+            coinInformations.market_data.total_supply ||
+              coinInformations.market_data.max_supply
+          )
+        : "-"
+    );
     // Links & social media
-    const homepage = coinInformations.links.homepage.length > 0 ? coinInformations.links.homepage[0] : null;
-    if(homepage) Boundary.find("#ct_link_homepage").attr('href', homepage).show();
+    const homepage =
+      coinInformations.links.homepage.length > 0
+        ? coinInformations.links.homepage[0]
+        : null;
+    if (homepage)
+      Boundary.find("#ct_link_homepage").attr("href", homepage).show();
     else Boundary.find("#ct_link_homepage").hide();
     const subreddit = coinInformations.links.subreddit_url || null;
-    if(subreddit) Boundary.find("#ct_link_reddit").attr('href', subreddit).show();
+    if (subreddit)
+      Boundary.find("#ct_link_reddit").attr("href", subreddit).show();
     else Boundary.find("#ct_link_reddit").hide();
     const twitterHandle = coinInformations.links.twitter_screen_name || null;
-    if(twitterHandle) Boundary.find("#ct_link_twitter").attr('href', "https://twitter.com/"+twitterHandle).show();
+    if (twitterHandle)
+      Boundary.find("#ct_link_twitter")
+        .attr("href", "https://twitter.com/" + twitterHandle)
+        .show();
     else Boundary.find("#ct_link_twitter").hide();
     const facebookUsername = coinInformations.links.facebook_username || null;
-    if(facebookUsername) Boundary.find("#ct_link_facebook").attr('href', "https://facebook.com/"+facebookUsername).show();
+    if (facebookUsername)
+      Boundary.find("#ct_link_facebook")
+        .attr("href", "https://facebook.com/" + facebookUsername)
+        .show();
     else Boundary.find("#ct_link_facebook").hide();
-    const telegramIdentifier = coinInformations.links.telegram_channel_identifier || null;
-    if(telegramIdentifier) Boundary.find("#ct_link_telegram").attr('href', "https://t.me/"+telegramIdentifier).show();
+    const telegramIdentifier =
+      coinInformations.links.telegram_channel_identifier || null;
+    if (telegramIdentifier)
+      Boundary.find("#ct_link_telegram")
+        .attr("href", "https://t.me/" + telegramIdentifier)
+        .show();
     else Boundary.find("#ct_link_telegram").hide();
-    const github = coinInformations.links.repos_url.github.length > 0 ? coinInformations.links.repos_url.github[0] : null;
-    if(github) Boundary.find("#ct_link_github").attr('href', github).show();
+    const github =
+      coinInformations.links.repos_url.github.length > 0
+        ? coinInformations.links.repos_url.github[0]
+        : null;
+    if (github) Boundary.find("#ct_link_github").attr("href", github).show();
     else Boundary.find("#ct_link_github").hide();
-    Boundary.find("#ct_link_coinmarketcap").attr('href', "https://coinmarketcap.com/currencies/"+coinInformations.id).show();
-    Boundary.find("#ct_link_coingecko").attr('href', "https://www.coingecko.com/en/coins/"+coinInformations.id).show();
-    Boundary.find("#ct_logo_coingecko").attr('src', chrome.runtime.getURL('images/coingecko_logo.png')).show();
-    const explorer = coinInformations.links.blockchain_site.length > 0 ? 
-      coinInformations.links.blockchain_site.find(link => link.includes('etherscan.io') || link.includes('bscscan.com')) || coinInformations.links.blockchain_site[0] : null;
-    if(explorer) Boundary.find("#ct_link_explorer").attr('href', explorer).show();
+    Boundary.find("#ct_link_coinmarketcap")
+      .attr(
+        "href",
+        "https://coinmarketcap.com/currencies/" + coinInformations.id
+      )
+      .show();
+    Boundary.find("#ct_link_coingecko")
+      .attr("href", "https://www.coingecko.com/en/coins/" + coinInformations.id)
+      .show();
+    Boundary.find("#ct_logo_coingecko")
+      .attr("src", chrome.runtime.getURL("images/coingecko_logo.png"))
+      .show();
+    const explorer =
+      coinInformations.links.blockchain_site.length > 0
+        ? coinInformations.links.blockchain_site.find(
+            (link) =>
+              link.includes("etherscan.io") || link.includes("bscscan.com")
+          ) || coinInformations.links.blockchain_site[0]
+        : null;
+    if (explorer)
+      Boundary.find("#ct_link_explorer").attr("href", explorer).show();
     else Boundary.find("#ct_link_explorer").hide();
     // Logo & images
-    if(coinInformations.image.small) {
+    if (coinInformations.image.small) {
       const logo = Boundary.find("#ct_coin_logo");
-      logo.attr('src', coinInformations.image.small);
+      logo.attr("src", coinInformations.image.small);
     }
     const image = Boundary.find("#ct_market");
-    image.css('background-image', "url("+chrome.runtime.getURL('images/splash.jpg')+")");
+    image.css(
+      "background-image",
+      "url(" + chrome.runtime.getURL("images/splash.jpg") + ")"
+    );
     return true;
   };
 
@@ -235,8 +277,14 @@
     const coinId = symbolNode.getAttribute("ct_coin_id");
     // Move it to the right location (bottom-right of the current node)
     const $el = $(symbolNode);
-    const bottom = Math.min($el.offset().top + $el.outerHeight(true), $(window).scrollTop() + document.documentElement.clientHeight - 350)
-    const right = Math.min($el.offset().left + $el.outerWidth(true), $(window).scrollLeft() + document.documentElement.clientWidth - 700)
+    const bottom = Math.min(
+      $el.offset().top + $el.outerHeight(true),
+      $(window).scrollTop() + document.documentElement.clientHeight - 350
+    );
+    const right = Math.min(
+      $el.offset().left + $el.outerWidth(true),
+      $(window).scrollLeft() + document.documentElement.clientWidth - 700
+    );
     $(boxSelector).css({ top: bottom, left: right });
     await populatePopup(coinId);
     // Once everything is over, we can safely display popup
@@ -264,7 +312,7 @@
       displayLoadingCursor(elementHovered);
       // Traverse node & wait until nodes are added to DOM, and display popup if it's hovered
       const observer = new MutationObserver((mutations) => {
-        for(const mutation of mutations) {
+        for (const mutation of mutations) {
           if (!mutation.addedNodes) continue;
           // .querySelectorAll with hover would not be refreshed yet & no event can be catch, wait 10ms... no other solution found
           setTimeout(() => {
