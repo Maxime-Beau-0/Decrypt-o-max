@@ -124,11 +124,13 @@
   };
   createSymbolPopup();
   
-  const displayLoadingCursor = () => {
-    $('body').addClass('waiting');
+  const displayLoadingCursor = (node) => {
+    $('body').addClass('ct_waiting');
+    $(node).addClass('ct_waiting');
   }
-  const hideLoadingCursor = () => {
-    $('body').removeClass('waiting');
+  const hideLoadingCursor = (node) => {
+    $('body').removeClass('ct_waiting');
+    $(node).removeClass('ct_waiting');
   }
 
   const populatePopup = async (coinId) => {
@@ -200,7 +202,7 @@
       return;
     }
     // Display loading
-    displayLoadingCursor();
+    displayLoadingCursor(symbolNode);
     // Get coin id and populate popup based on these informations
     const coinId = symbolNode.getAttribute("ct_coin_id");
     // Move it to the right location (bottom-right of the current node)
@@ -210,7 +212,7 @@
     $(boxSelector).css({ top: bottom, left: right });
     await populatePopup(coinId);
     // Once everything is over, we can safely display popup
-    hideLoadingCursor();
+    hideLoadingCursor(symbolNode);
     $(boxSelector).show();
   };
 
@@ -226,12 +228,12 @@
       hidePopup();
       const hoveredNodes = document.querySelectorAll(":hover");
       const elementHovered = Array.from(hoveredNodes.values()).pop();
-      displayLoadingCursor();
       // If it's a symbol node, display popup. Otherwise traverse it to add symbol nodes just in case
       if (isSymbolNode(elementHovered)) {
         displayPopup(elementHovered);
         return;
       }
+      displayLoadingCursor(elementHovered);
       // Traverse node & wait until nodes are added to DOM, and display popup if it's hovered
       const observer = new MutationObserver((mutations) => {
         for(const mutation of mutations) {
@@ -246,7 +248,7 @@
           }, 10);
           break;
         }
-        hideLoadingCursor();
+        hideLoadingCursor(elementHovered);
       });
       observer.observe(elementHovered, {
         childList: true,
@@ -257,7 +259,7 @@
       // Stop observing after 500ms to avoid displaying a popup too late
       setTimeout(() => {
         observer.disconnect();
-        hideLoadingCursor();
+        hideLoadingCursor(elementHovered);
       }, 500);
     }
   });
