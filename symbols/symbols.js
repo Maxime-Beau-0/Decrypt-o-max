@@ -47,10 +47,18 @@
   // Get all symbols & create a regexp from it
   const symbols = (await fetchTopic("symbols")).filter(coin => !coin.id.startsWith('binance-peg'));
   let regexpSymbols;
+  let regexpNames;
   try {
     regexpSymbols = new RegExp(
       `\\b(${symbols
         .map((coin) => coin.symbol)
+        .map(escapeRegExp)
+        .join("|")})\\b`,
+      "gmi"
+    );
+    regexpNames = new RegExp(
+      `\\b(${symbols
+        .map((coin) => coin.name)
         .map(escapeRegExp)
         .join("|")})\\b`,
       "gmi"
@@ -61,6 +69,15 @@
       `\\b(${symbols
         .slice(0, 9000)
         .map((coin) => coin.symbol)
+        .map(escapeRegExp)
+        .join("|")})\\b`,
+      "gmi"
+    );
+    // In case there is now too many tokens, take the first 9k
+    regexpNames = new RegExp(
+      `\\b(${symbols
+        .slice(0, 9000)
+        .map((coin) => coin.name)
         .map(escapeRegExp)
         .join("|")})\\b`,
       "gmi"
@@ -78,7 +95,7 @@
     newElement.setAttribute("ct_symbol", text);
     newElement.setAttribute(
       "ct_coin_id",
-      symbols.find((coin) => coin.symbol.toLowerCase() === text.toLowerCase())
+      symbols.find((coin) => coin.symbol.toLowerCase() === text.toLowerCase() || coin.name.toLowerCase() === text.toLowerCase())
         .id
     );
     newElement.appendChild(document.createTextNode(text));
@@ -108,11 +125,12 @@
         }
         continue;
       }
-      // Get all symbols in this node's text
-      const matches = node.textContent.matchAll(regexpSymbols);
+      // Get all names & symbols in this node's text
+      const matches = Array.from(node.textContent.matchAll(regexpSymbols));
+      matches.push(...Array.from(node.textContent.matchAll(regexpNames)));
       // Iterate in reverse order (symbols at the end of the node first)
       // because we're going to split the current node on each iteration, and only keep the beginning
-      for (const match of Array.from(matches).reverse()) {
+      for (const match of matches.sort((match1, match2) => match1.index > match2.index)) {
         // Get useful variables
         const symbolFound = match[0];
         const index = match.index;
