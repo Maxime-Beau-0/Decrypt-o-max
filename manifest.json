@@ -17,6 +17,7 @@
       "js": [
         "libs/boundary/jquery.js",
         "libs/boundary/boundary.js",
+        "utils/cursor.js",
         "utils/format.js",
         "utils/node.js",
         "utils/storage.js",
