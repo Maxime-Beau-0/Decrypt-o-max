@@ -13,6 +13,17 @@
     box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
 }
 
+#ct_popup_address {
+  background-color: white;
+  height: 150px;
+  width: 350px;
+  display: none;
+  position: absolute;
+  z-index: 9999;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
 body.ct_waiting * {
   cursor: progress !important;
 }

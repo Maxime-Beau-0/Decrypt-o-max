@@ -35,6 +35,8 @@
         "images/coingecko_logo.png",
         "images/splash.jpg",
         "libs/boundary/boundary-extra.css",
+        "addresses/popup.css",
+        "addresses/popup.html",
         "symbols/popup.css",
         "symbols/popup.html"
       ],

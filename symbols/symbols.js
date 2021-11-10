@@ -17,6 +17,8 @@
       )
     );
   }
+  // Eth addresses
+  const regexpEth = new RegExp(`\\b0x[a-fA-F0-9]{40}\\b`, 'gmi');
 
   /**
    * Method used to surround a "text" at "index" in "node" with a span element
@@ -48,6 +50,33 @@
       0,
       index
     )}${node.textContent.slice(index + text.length)}`;
+    // Insert the new span
+    node.parentNode.insertBefore(newElement, node.splitText(index));
+    return newElement;
+  };
+
+  /**
+   * Method used to surround an "address" at "index" in "node" with a span element
+   * @param {*} node
+   * @param {*} index
+   * @param {*} address
+   * @returns
+   */
+   const injectSpanAroundEthAddress = (node, index, address) => {
+    // Check that this text is not already surrounded by our injected span
+    if (isSymbolNode(node.parentNode)) {
+      return null;
+    }
+    // Create a new span element with our class & the address as attribute & text
+    const newElement = document.createElement("span");
+    newElement.classList = "ct_address";
+    newElement.setAttribute("ct_address", address);
+    newElement.appendChild(document.createTextNode(address));
+    // Remove text at this specific position - .replace() would not as it could replace another occurence of this string
+    node.textContent = `${node.textContent.slice(
+      0,
+      index
+    )}${node.textContent.slice(index + address.length)}`;
     // Insert the new span
     node.parentNode.insertBefore(newElement, node.splitText(index));
     return newElement;
@@ -87,6 +116,25 @@
           nodesAffected.push(addedNode);
         }
       }
+      
+      // Get all eth addresses in this node's text
+      const ethMatches = Array.from(node.textContent.matchAll(regexpEth));
+      console.log('ETH : ', ethMatches);
+      console.log('regexpEth : ', regexpEth);
+      console.log('node.textContent : ', node.textContent);
+      // Iterate in reverse order (terms at the end of the node first)
+      // because we're going to split the current node on each iteration, and only keep the beginning
+      for (const match of ethMatches.sort((match1, match2) =>
+        match1.index > match2.index ? -1 : 1
+      )) {
+        // Get useful variables
+        const addressFound = match[0];
+        const index = match.index;
+        const addedNode = injectSpanAroundEthAddress(node, index, addressFound);
+        if (addedNode) {
+          nodesAffected.push(addedNode);
+        }
+      }
     }
     return nodesAffected;
   };
@@ -107,6 +155,20 @@
     Boundary.rewriteBox(boxSelector, popupContent);
   };
   createSymbolPopup();
+
+  const addressBoxId = "ct_popup_address";
+  const addressBoxSelector = `#${addressBoxId}`;
+  const createAddressPopup = async () => {
+    const box = Boundary.createBox(addressBoxId, "shadow");
+    Boundary.loadBoxCSS(
+      addressBoxSelector,
+      chrome.runtime.getURL("addresses/popup.css")
+    );
+    const response = await fetch(chrome.runtime.getURL("addresses/popup.html"));
+    const popupContent = await response.text();
+    Boundary.rewriteBox(addressBoxSelector, popupContent);
+  };
+  createAddressPopup();
 
   const populatePopup = async (coinId) => {
     const coinInformations = await fetchTopic("coin", {
@@ -248,6 +310,33 @@
     return true;
   };
 
+  const populateAddressPopup = async (address) => {
+    const addressInformations = await fetchTopic("ethereumAddress", {
+      forceRefresh: true,
+      data: { address },
+    });
+    console.info(
+      "CryptoTracker - displaying address informations : ",
+      address,
+      addressInformations
+    );
+    if (!addressInformations) {
+      return;
+    }
+    // Balance & transactions
+    Boundary.rewrite(
+      "#ct_address",
+      address
+    );
+    Boundary.rewrite(
+      "#ct_address_balance",
+      `${formatToUsNumber(addressInformations * 0.000000000000000001)} ETH`
+    );
+    // Links & social media
+    Boundary.find("#ct_link_etherscan").attr("href", `https://etherscan.io/address/${address}`).show();
+    return true;
+  };
+
   const displayPopup = async (symbolNode) => {
     if (!isSymbolNode(symbolNode)) {
       console.warn("Trying to display popup on a non-symbol node...");
@@ -274,21 +363,52 @@
     $(boxSelector).show();
   };
 
+  const displayAddressPopup = async (symbolNode) => {
+    if (!isAddressNode(symbolNode)) {
+      console.warn("Trying to display popup on a non-address node...");
+      return;
+    }
+    // Display loading
+    displayLoadingCursor(symbolNode);
+    // Get coin id and populate popup based on these informations
+    const address = symbolNode.getAttribute("ct_address");
+    // Move it to the right location (bottom-right of the current node)
+    const $el = $(symbolNode);
+    const bottom = Math.min(
+      $el.offset().top + $el.outerHeight(true),
+      $(window).scrollTop() + document.documentElement.clientHeight - 150
+    );
+    const right = Math.min(
+      $el.offset().left + $el.outerWidth(true),
+      $(window).scrollLeft() + document.documentElement.clientWidth - 350
+    );
+    $(addressBoxSelector).css({ top: bottom, left: right });
+    await populateAddressPopup(address);
+    // Once everything is over, we can safely display popup
+    hideLoadingCursor(symbolNode);
+    $(addressBoxSelector).show();
+  };
+
   const hidePopup = () => {
     $(boxSelector).hide();
+    $(addressBoxSelector).hide();
   };
 
   // Listener on CTRL key down to display popup, ESC to hide it
   $(document).on("keydown", async (e) => {
     if (e.which == 27) {
       hidePopup();
-    } else if (e.which == 17) {
+    } else if (e.which == 84) {
       hidePopup();
       const hoveredNodes = document.querySelectorAll(":hover");
       const elementHovered = Array.from(hoveredNodes.values()).pop();
       // If it's a symbol node, display popup. Otherwise traverse it to add symbol nodes just in case
       if (isSymbolNode(elementHovered)) {
         displayPopup(elementHovered);
+        return;
+      }
+      if (isAddressNode(elementHovered)) {
+        displayAddressPopup(elementHovered);
         return;
       }
       displayLoadingCursor(elementHovered);
@@ -302,6 +422,9 @@
             const elementHovered = Array.from(hoveredNodes.values()).pop();
             if (isSymbolNode(elementHovered)) {
               displayPopup(elementHovered);
+            }
+            if (isAddressNode(elementHovered)) {
+              displayAddressPopup(elementHovered);
             }
           }, 10);
           break;

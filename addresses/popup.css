@@ -1,0 +1,78 @@
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bree+Serif&family=EB+Garamond:ital,wght@0,500;1,800&display=swap");
+
+body {
+  background-attachment: fixed;
+  background-size: cover;
+  overflow: hidden;
+}
+
+body.waiting * {
+  cursor: progress !important;
+}
+
+#container {
+  box-shadow: 0 15px 30px 1px grey;
+  background: rgba(255, 255, 255, 0.9);
+  text-align: left;
+  overflow: hidden;
+  margin: 0;
+  height: 175px;
+  width: 350px;
+  color: #344055;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+#container .info-container {
+  display: flex;
+}
+
+#container h1 {
+  font-family: "Bebas Neue", cursive;
+  display: inline-block;
+  position: relative;
+  max-width: 320px;
+  font-size: 19px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+#container .social-media {
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+  width: 100%;
+}
+
+#container .social-media a {
+  font-size: 30px;
+  color: inherit;
+  text-decoration: inherit; /* no underline */
+  width: 30px;
+  height: 30px;
+  text-align: center;
+}
+#container .social-media a:hover {
+  color: hsl(106, 53%, 51%);
+  opacity: 0.6;
+  transition: 0.3s;
+}
+
+.price-container {
+  font-family: "Farsan", cursive;
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  margin: 10px 0 0 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.price-container span {
+  font-family: "Bebas Neue", cursive;
+  display: inline-block;
+  position: relative;
+  font-size: 19px;
+  opacity: 0.6;
+}
