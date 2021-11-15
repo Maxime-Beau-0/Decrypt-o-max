@@ -16,11 +16,13 @@ body.waiting * {
   text-align: left;
   overflow: hidden;
   margin: 0;
-  height: 175px;
-  width: 350px;
+  height: 145px;
+  width: 320px;
   color: #344055;
   padding: 15px;
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 #container .info-container {
@@ -36,6 +38,7 @@ body.waiting * {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  margin: 0px;
 }
 
 #container .social-media {
@@ -43,6 +46,7 @@ body.waiting * {
   flex-direction: row;
   justify-content: right;
   width: 100%;
+  gap: 10px;
 }
 
 #container .social-media a {
@@ -61,12 +65,12 @@ body.waiting * {
 
 .price-container {
   font-family: "Farsan", cursive;
-  display: inline-block;
+  display: flex;
   position: relative;
   width: 100%;
-  margin: 10px 0 0 0;
   overflow: hidden;
   padding: 0;
+  gap: 10px;
 }
 
 .price-container span {
@@ -75,4 +79,15 @@ body.waiting * {
   position: relative;
   font-size: 19px;
   opacity: 0.6;
+}
+
+.price-container .logo-container {
+  height: 30px;
+  width: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.price-container .coin-logo {
+  height: 30px;
 }

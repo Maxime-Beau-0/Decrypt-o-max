@@ -32,6 +32,8 @@
   "web_accessible_resources": [
     {
       "resources": [
+        "images/binance-coin-bnb-logo.png",
+        "images/eth-diamond-purple.png",
         "images/coingecko_logo.png",
         "images/splash.jpg",
         "libs/boundary/boundary-extra.css",

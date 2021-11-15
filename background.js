@@ -32,21 +32,28 @@ const fetchCoin = async (coinId) => {
   }
 };
 
-const fetchEthereumAddress = async (address) => {
-  console.info(`Fetching address ${address} from etherscan api...`);
-  const urlBalance = `https://api.etherscan.io/api?module=account&action=balance&address=${address}&tag=latest`;
-  // const urlTransactions = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc`;
+const fetchEthAddress = async (address) => {
+  console.info(`Fetching address ${address} from etherscan & bscscan api...`);
+  
+  const urlBalanceEth = `https://api.etherscan.io/api?module=account&action=balance&address=${address}&tag=latest`;
+  // const urlTransactionsEth = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc`;
+  const urlBalanceBsc = `https://api.bscscan.com/api?module=account&action=balance&address=${address}&tag=latest`;
   try {
-    const response = await fetch(urlBalance);
-    const responseText = await response.text();
-    const data = JSON.parse(responseText);
-    // console.info('Extension cryptoTracker : result when fetching ', coinId, ' = ', coin)
-    if(data.status !== "1") {
-      throw new Error('Etherscan api rate exceeded');
+    const responseEth = await fetch(urlBalanceEth);
+    const responseTextEth = await responseEth.text();
+    const dataEth = JSON.parse(responseTextEth);
+    const responseBsc = await fetch(urlBalanceBsc);
+    const responseTextBsc = await responseBsc.text();
+    const dataBsc = JSON.parse(responseTextBsc);
+    if(dataEth.status !== "1" || dataBsc.status !== "1") {
+      throw new Error('Api rate exceeded');
     }
-    return data.result; // Data.result is the balance of this address
+    return {
+      bscBalance: dataBsc.result,
+      ethBalance: dataEth.result
+    }
   } catch (e) {
-    console.error("Extension cryptoTracker error in fetchCoin : ", e);
+    console.error("Extension cryptoTracker error in fetchAddress : ", e);
     return null;
   }
 };
@@ -63,8 +70,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse(coinInformations);
     });
   }
-  if (request.topic == "ethereumAddress") {
-    fetchEthereumAddress(request.data.address).then((addressInformations) => {
+  if (request.topic == "ethAddress") {
+    fetchEthAddress(request.data.address).then((addressInformations) => {
       sendResponse(addressInformations);
     });
   }

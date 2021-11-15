@@ -17,7 +17,7 @@
       )
     );
   }
-  // Eth addresses
+  // Eth & Bsc addresses
   const regexpEth = new RegExp(`\\b0x[a-fA-F0-9]{40}\\b`, 'gmi');
 
   /**
@@ -119,9 +119,6 @@
       
       // Get all eth addresses in this node's text
       const ethMatches = Array.from(node.textContent.matchAll(regexpEth));
-      console.log('ETH : ', ethMatches);
-      console.log('regexpEth : ', regexpEth);
-      console.log('node.textContent : ', node.textContent);
       // Iterate in reverse order (terms at the end of the node first)
       // because we're going to split the current node on each iteration, and only keep the beginning
       for (const match of ethMatches.sort((match1, match2) =>
@@ -310,8 +307,8 @@
     return true;
   };
 
-  const populateAddressPopup = async (address) => {
-    const addressInformations = await fetchTopic("ethereumAddress", {
+  const populateEthAddressPopup = async (address) => {
+    const addressInformations = await fetchTopic("ethAddress", {
       forceRefresh: true,
       data: { address },
     });
@@ -329,11 +326,18 @@
       address
     );
     Boundary.rewrite(
-      "#ct_address_balance",
-      `${formatToUsNumber(addressInformations * 0.000000000000000001)} ETH`
+      "#ct_address_eth_balance",
+      `${formatToUsNumber(addressInformations.ethBalance * 0.000000000000000001)} ETH`
     );
-    // Links & social media
+    Boundary.rewrite(
+      "#ct_address_bsc_balance",
+      `${formatToUsNumber(addressInformations.bscBalance * 0.000000000000000001)} BNB`
+    );
+    // Links, logos & social media
+    Boundary.find("#ct_logo_eth").attr("src", chrome.runtime.getURL("images/eth-diamond-purple.png")).show();
+    Boundary.find("#ct_logo_bnb").attr("src", chrome.runtime.getURL("images/binance-coin-bnb-logo.png")).show();
     Boundary.find("#ct_link_etherscan").attr("href", `https://etherscan.io/address/${address}`).show();
+    Boundary.find("#ct_link_bscscan").attr("href", `https://bscscan.com/address/${address}`).show();
     return true;
   };
 
@@ -383,7 +387,7 @@
       $(window).scrollLeft() + document.documentElement.clientWidth - 350
     );
     $(addressBoxSelector).css({ top: bottom, left: right });
-    await populateAddressPopup(address);
+    await populateEthAddressPopup(address);
     // Once everything is over, we can safely display popup
     hideLoadingCursor(symbolNode);
     $(addressBoxSelector).show();
