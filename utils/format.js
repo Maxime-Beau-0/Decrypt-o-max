@@ -14,9 +14,9 @@ const formatToUsPercent = (number) => {
     maximumFractionDigits: 2,
   }).format(number / 100);
 };
-const formatToUsNumber = (number) => {
+const formatToUsNumber = (number, maximumFractionDigits = 9) => {
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 0,
-    maximumFractionDigits: 9,
+    maximumFractionDigits,
   }).format(number);
 };

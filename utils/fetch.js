@@ -1,6 +1,6 @@
 const fetchTopic = async (topic, options) => {
   // Get options
-  const forceRefresh = options && options.forceRefresh;
+  const forceRefresh = true; // options && options.forceRefresh;
   const data = options && options.data ? options.data : {};
 
   const topicInStorage = await getFromStorage(topic);

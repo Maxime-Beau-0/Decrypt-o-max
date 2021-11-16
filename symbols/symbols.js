@@ -1,7 +1,8 @@
 (async () => {
+  const coinsToIgnore = ["com", "coin", "bit", "token"]; // Ignore stupid coins that have a name too generic causing false detections
   // Get all coins & create regexp from it
   const coins = (await fetchTopic("coins")).filter(
-    (coin) => !coin.id.startsWith("binance-peg")
+    (coin) => !coin.id.startsWith("binance-peg") && !coinsToIgnore.includes(coin.id) && !coinsToIgnore.includes(coin.symbol)
   );
   const regexps = [];
   // List of names then list of symbols
@@ -17,14 +18,25 @@
       )
     );
   }
-  // Eth & Bsc addresses
+  // Regexp for Eth & Bsc addresses & contracts
   const regexpEth = new RegExp(`\\b0x[a-fA-F0-9]{40}\\b`, 'gmi');
+  
+  // Create a list of contracts from our coins
+  const contracts = new Map();
+  for(const coin of coins) {
+    if(!('platforms' in coin)) continue;
+    for(const [platform, contractAddress] of Object.entries(coin.platforms)) {
+      if(!contractAddress) continue;
+      contracts.set(contractAddress.toLowerCase(), coin.symbol);
+    }
+  }
+  const regexpContracts = new RegExp(`\\b(${Array.from(contracts.keys()).map(contract => contract.toLowerCase()).join('|')})\\b`, 'gmi');
 
   /**
    * Method used to surround a "text" at "index" in "node" with a span element
    * @param {*} node
    * @param {*} index
-   * @param {*} text
+   * @param {*} text can be a coin name or a coin symbol
    * @returns
    */
   const injectSpanAroundText = (node, index, text) => {
@@ -50,6 +62,45 @@
       0,
       index
     )}${node.textContent.slice(index + text.length)}`;
+    // Insert the new span
+    node.parentNode.insertBefore(newElement, node.splitText(index));
+    return newElement;
+  };
+
+  /**
+   * Method used to surround a "contractAddress" at "index" in "node" with a span element
+   * @param {*} node
+   * @param {*} index
+   * @param {*} contractAddress
+   * @returns
+   */
+  const injectSpanAroundContractAddress = (node, index, contractAddress) => {
+    // Check that this text is not already surrounded by our injected span
+    if (isSymbolNode(node.parentNode)) {
+      return null;
+    }
+    const symbol = contracts.get(contractAddress.toLowerCase());
+    if(!symbol) {
+      return null;
+    }
+    // Create a new span element with our class & the symbolFound as attribute & text
+    const newElement = document.createElement("span");
+    newElement.classList = "ct_symbol";
+    newElement.setAttribute("ct_symbol", symbol);
+    newElement.setAttribute("ct_contract_address", contractAddress);
+    newElement.setAttribute(
+      "ct_coin_id",
+      coins.find(
+        (coin) =>
+          coin.symbol.toLowerCase() === symbol.toLowerCase()
+      ).id
+    );
+    newElement.appendChild(document.createTextNode(contractAddress));
+    // Remove text at this specific position - .replace() would not as it could replace another occurence of this string
+    node.textContent = `${node.textContent.slice(
+      0,
+      index
+    )}${node.textContent.slice(index + contractAddress.length)}`;
     // Insert the new span
     node.parentNode.insertBefore(newElement, node.splitText(index));
     return newElement;
@@ -127,7 +178,29 @@
         // Get useful variables
         const addressFound = match[0];
         const index = match.index;
+        // Check that this address is not a contract -> it will be handled differently
+        const symbolFromContract = contracts.get(addressFound.toLowerCase());
+        if(symbolFromContract) {
+          continue;
+        }
         const addedNode = injectSpanAroundEthAddress(node, index, addressFound);
+        if (addedNode) {
+          nodesAffected.push(addedNode);
+        }
+      }
+
+      // Get all contracts in this node's text
+      const contractsMatches = Array.from(node.textContent.matchAll(regexpContracts));
+      // Iterate in reverse order (terms at the end of the node first)
+      // because we're going to split the current node on each iteration, and only keep the beginning
+      for (const match of contractsMatches.sort((match1, match2) =>
+        match1.index > match2.index ? -1 : 1
+      )) {
+        // Get useful variables
+        const addressFound = match[0];
+        const index = match.index;
+        // Check that this address is not a contract -> it will be handled differently
+        const addedNode = injectSpanAroundContractAddress(node, index, addressFound);
         if (addedNode) {
           nodesAffected.push(addedNode);
         }
@@ -327,11 +400,11 @@
     );
     Boundary.rewrite(
       "#ct_address_eth_balance",
-      `${formatToUsNumber(addressInformations.ethBalance * 0.000000000000000001)} ETH`
+      `${formatToUsNumber(addressInformations.ethBalance * 0.000000000000000001, 6)} ETH`
     );
     Boundary.rewrite(
       "#ct_address_bsc_balance",
-      `${formatToUsNumber(addressInformations.bscBalance * 0.000000000000000001)} BNB`
+      `${formatToUsNumber(addressInformations.bscBalance * 0.000000000000000001, 6)} BNB`
     );
     // Links, logos & social media
     Boundary.find("#ct_logo_eth").attr("src", chrome.runtime.getURL("images/eth-diamond-purple.png")).show();

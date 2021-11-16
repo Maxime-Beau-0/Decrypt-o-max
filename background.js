@@ -1,7 +1,7 @@
 // background.js
 const fetchCoins = async () => {
   console.info('Fetching coins from coingecko api...');
-  const url = "https://api.coingecko.com/api/v3/coins/list";
+  const url = "https://api.coingecko.com/api/v3/coins/list?include_platform=true";
   try {
     const response = await fetch(url);
     const data = await response.text();
