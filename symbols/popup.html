@@ -47,6 +47,7 @@
   <section class="market" id="ct_market">
     <div class="market-informations">
       <div class="col">
+        <div class="cell">Rank</div>
         <div class="cell">Market-cap</div>
         <div class="cell">All-time high</div>
         <div class="cell">All-time low</div>
@@ -55,9 +56,16 @@
         <div class="cell">Max supply</div>
       </div>
       <div class="col">
+        <div class="cell" id="ct_coin_rank"></div>
         <div class="cell" id="ct_coin_marketcap"></div>
-        <div class="cell" id="ct_coin_ath"></div>
-        <div class="cell" id="ct_coin_atl"></div>
+        <div class="cell">
+          <span id="ct_coin_ath"></span>
+          <span class="price-change" id="ct_coin_change_ath"></span>
+        </div>
+        <div class="cell">
+          <span id="ct_coin_atl"></span>
+          <span class="price-change" id="ct_coin_change_atl"></span>
+        </div>
         <div class="cell" id="ct_coin_24h_volume"></div>
         <div class="cell" id="ct_coin_current_supply"></div>
         <div class="cell" id="ct_coin_max_supply"></div>

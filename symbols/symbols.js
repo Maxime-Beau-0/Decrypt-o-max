@@ -260,9 +260,10 @@
     Boundary.rewrite("#ct_coin_description", description);
     Boundary.find("#ct_coin_description").attr("title", description);
     // Price & market informations
+    const currentPrice = coinInformations.market_data.current_price.usd;
     Boundary.rewrite(
       "#ct_coin_current_price",
-      formatToUsd(coinInformations.market_data.current_price.usd)
+      formatToUsd(currentPrice)
     );
     Boundary.rewrite(
       "#ct_coin_change_24h",
@@ -277,6 +278,10 @@
         : "#f44336"
     );
     Boundary.rewrite(
+      "#ct_coin_rank",
+      formatToUsNumber(coinInformations.market_data.market_cap_rank)
+    );
+    Boundary.rewrite(
       "#ct_coin_marketcap",
       formatToUsd(coinInformations.market_data.market_cap.usd)
     );
@@ -284,9 +289,25 @@
       "#ct_coin_ath",
       formatToUsd(coinInformations.market_data.ath.usd)
     );
+    const changeAth = getPercentageChange(coinInformations.market_data.ath.usd, currentPrice) * -1;
+    Boundary.rewrite(
+      "#ct_coin_change_ath",
+      formatToUsPercent(changeAth)
+    );
+    Boundary.find("#ct_coin_change_ath").css(
+      "color", "#f44336"
+    );
     Boundary.rewrite(
       "#ct_coin_atl",
       formatToUsd(coinInformations.market_data.atl.usd)
+    );
+    const changeAtl = getPercentageChange(coinInformations.market_data.atl.usd, currentPrice) * -1;
+    Boundary.rewrite(
+      "#ct_coin_change_atl",
+      formatToUsPercent(changeAtl)
+    );
+    Boundary.find("#ct_coin_change_atl").css(
+      "color", "#7ab52b"
     );
     Boundary.rewrite(
       "#ct_coin_24h_volume",

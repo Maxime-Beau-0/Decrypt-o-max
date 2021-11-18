@@ -20,3 +20,8 @@ const formatToUsNumber = (number, maximumFractionDigits = 9) => {
     maximumFractionDigits,
   }).format(number);
 };
+
+function getPercentageChange(oldNumber, newNumber){
+  if(oldNumber === 0) return '-';
+  return ((oldNumber - newNumber) / oldNumber) * 100;
+}

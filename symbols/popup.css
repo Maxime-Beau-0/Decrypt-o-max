@@ -121,7 +121,7 @@ body.waiting * {
   margin-left: 5px;
 }
 
-.price-container .price-change {
+.price-container .price-change, .price-change {
   font-family: "Bebas Neue", cursive;
   display: inline-block;
   position: relative;
@@ -203,17 +203,17 @@ body.waiting * {
 }
 
 #container .market .market-informations .col:first-of-type .cell {
-  border-right: 1px dashed #7d7d7d;
+  border-right: 1px solid #7d7d7d7d;
 }
 #container .market .market-informations .col .cell {
-  border-bottom: 1px dashed #7d7d7d;
+  border-bottom: 1px solid #7d7d7d7d;
 }
 #container .market .market-informations .col .cell:last-of-type {
   border-bottom: none;
 }
 
 #container .market .market-informations .cell {
-  padding: 10px;
+  padding: 8px;
 }
 
 /**
