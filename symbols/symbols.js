@@ -1,13 +1,13 @@
 (async () => {
-  const coinsToIgnore = ["com", "coin", "bit", "token"]; // Ignore stupid coins that have a name too generic causing false detections
+  const coinsToIgnore = ["com", "coin", "bit", "token", "inu"]; // Ignore stupid coins that have a name too generic causing false detections
   // Get all coins & create regexp from it
   const coins = (await fetchTopic("coins")).filter(
     (coin) => !coin.id.startsWith("binance-peg") && !coinsToIgnore.includes(coin.id) && !coinsToIgnore.includes(coin.symbol)
   );
   const regexps = [];
   // List of names then list of symbols
-  let searchTerms = coins.map((coin) => coin.name.toLowerCase()).map(escapeRegExp);
-  searchTerms.push(...coins.map((coin) => coin.symbol.toLowerCase()).map(escapeRegExp));
+  let searchTerms = coins.map((coin) => escapeRegExp(coin.name.toLowerCase()));
+  searchTerms.push(...coins.map((coin) => escapeRegExp(coin.symbol.toLowerCase())));
   const uniqueSearchTerms = [...new Set(searchTerms)];
   // Create an array of regexps from our search terms
   for (let i = 0; i < uniqueSearchTerms.length; i += 2000) {
@@ -156,9 +156,12 @@
       }
       // Iterate in reverse order (terms at the end of the node first)
       // because we're going to split the current node on each iteration, and only keep the beginning
-      for (const match of matches.sort((match1, match2) =>
+      matches.sort((match1, match2) =>
         match1.index > match2.index ? -1 : 1
-      )) {
+      );
+
+      for (const match of matches) {
+        console.log('Match', match);
         // Get useful variables
         const symbolFound = match[0];
         const index = match.index;
@@ -279,7 +282,7 @@
     );
     Boundary.rewrite(
       "#ct_coin_rank",
-      formatToUsNumber(coinInformations.market_data.market_cap_rank)
+      coinInformations.market_data.market_cap_rank ? formatToUsNumber(coinInformations.market_data.market_cap_rank) : '-'
     );
     Boundary.rewrite(
       "#ct_coin_marketcap",
