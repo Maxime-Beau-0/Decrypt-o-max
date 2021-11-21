@@ -1,8 +1,7 @@
 (async () => {
-  const coinsToIgnore = ["com", "coin", "bit", "token", "inu"]; // Ignore stupid coins that have a name too generic causing false detections
   // Get all coins & create regexp from it
   const coins = (await fetchTopic("coins")).filter(
-    (coin) => !coin.id.startsWith("binance-peg") && !coinsToIgnore.includes(coin.id) && !coinsToIgnore.includes(coin.symbol)
+    (coin) => !coin.id.startsWith("binance-peg")
   );
   const regexps = [];
   // List of names then list of symbols
@@ -150,7 +149,7 @@
         continue;
       }
       // Get all names & symbols in this node's text
-      const matches = [];
+      let matches = [];
       for (const regexp of regexps) {
         matches.push(...Array.from(node.textContent.matchAll(regexp)));
       }
@@ -160,8 +159,17 @@
         match1.index > match2.index ? -1 : 1
       );
 
-      for (const match of matches) {
-        console.log('Match', match);
+      // Remove matches "inside" other matches
+      const encompassingMatches = [];
+      for(const match of matches) {
+        // Find a match encompassing this one. If found, do not keep this match.
+        const isInsideAnotherMatch = matches.some(_match => (_match.index < match.index && _match.index + _match[0].length >= match.index + match[0].length) || (_match.index <= match.index && _match.index + _match[0].length > match.index + match[0].length));
+        if(!isInsideAnotherMatch) {
+          encompassingMatches.push(match);
+        }
+      }
+
+      for (const match of encompassingMatches) {
         // Get useful variables
         const symbolFound = match[0];
         const index = match.index;
@@ -258,6 +266,7 @@
     }
     // Name & description
     Boundary.rewrite("#ct_coin_name", coinInformations.name);
+    Boundary.find("#ct_coin_name").attr("title", coinInformations.name);
     Boundary.rewrite("#ct_coin_symbol", "(" + coinInformations.symbol + ")");
     const description = $($.parseHTML(coinInformations.description.en)).text();
     Boundary.rewrite("#ct_coin_description", description);
