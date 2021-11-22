@@ -6,10 +6,10 @@ const fetchCoins = async () => {
     const response = await fetch(url);
     const data = await response.text();
     const coins = JSON.parse(data);
-    // console.info('Extension cryptoTracker : ', coins.length, 'coins found = ', coins)
+    // console.info('Extension decrypt-o-max : ', coins.length, 'coins found = ', coins)
     return coins;
   } catch (e) {
-    console.error("Extension cryptoTracker error in fetchCoins : ", e);
+    console.error("Extension decrypt-o-max error in fetchCoins : ", e);
     return null;
   }
 };
@@ -24,10 +24,10 @@ const fetchCoin = async (coinId) => {
     const response = await fetch(url);
     const responseText = await response.text();
     const coin = JSON.parse(responseText);
-    // console.info('Extension cryptoTracker : result when fetching ', coinId, ' = ', coin)
+    // console.info('Extension decrypt-o-max : result when fetching ', coinId, ' = ', coin)
     return coin;
   } catch (e) {
-    console.error("Extension cryptoTracker error in fetchCoin : ", e);
+    console.error("Extension decrypt-o-max, error in fetchCoin : ", e);
     return null;
   }
 };
@@ -53,7 +53,7 @@ const fetchEthAddress = async (address) => {
       ethBalance: dataEth.result
     }
   } catch (e) {
-    console.error("Extension cryptoTracker error in fetchAddress : ", e);
+    console.error("Extension decrypt-o-max, error in fetchAddress : ", e);
     return null;
   }
 };

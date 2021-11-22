@@ -1,4 +1,4 @@
-#ct_popup_symbol {
+#dcmax_popup_symbol {
   background-color: white;
   height: 350px;
   width: 700px;
@@ -9,11 +9,11 @@
   overflow-y: hidden;
 }
 
-#ct_popup_symbol.shadow {
+#dcmax_popup_symbol.shadow {
     box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
 }
 
-#ct_popup_address {
+#dcmax_popup_address {
   background-color: white;
   height: 175px;
   width: 350px;
@@ -24,9 +24,9 @@
   overflow-y: hidden;
 }
 
-body.ct_waiting * {
+body.dcmax_waiting * {
   cursor: progress !important;
 }
-.ct_waiting {
+.dcmax_waiting {
   cursor: progress !important;
 }

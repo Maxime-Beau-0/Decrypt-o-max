@@ -45,10 +45,10 @@
     }
     // Create a new span element with our class & the symbolFound as attribute & text
     const newElement = document.createElement("span");
-    newElement.classList = "ct_symbol";
-    newElement.setAttribute("ct_symbol", text);
+    newElement.classList = "dcmax_symbol";
+    newElement.setAttribute("dcmax_symbol", text);
     newElement.setAttribute(
-      "ct_coin_id",
+      "dcmax_coin_id",
       coins.find(
         (coin) =>
           coin.symbol.toLowerCase() === text.toLowerCase() ||
@@ -84,11 +84,11 @@
     }
     // Create a new span element with our class & the symbolFound as attribute & text
     const newElement = document.createElement("span");
-    newElement.classList = "ct_symbol";
-    newElement.setAttribute("ct_symbol", symbol);
-    newElement.setAttribute("ct_contract_address", contractAddress);
+    newElement.classList = "dcmax_symbol";
+    newElement.setAttribute("dcmax_symbol", symbol);
+    newElement.setAttribute("dcmax_contract_address", contractAddress);
     newElement.setAttribute(
-      "ct_coin_id",
+      "dcmax_coin_id",
       coins.find(
         (coin) =>
           coin.symbol.toLowerCase() === symbol.toLowerCase()
@@ -119,8 +119,8 @@
     }
     // Create a new span element with our class & the address as attribute & text
     const newElement = document.createElement("span");
-    newElement.classList = "ct_address";
-    newElement.setAttribute("ct_address", address);
+    newElement.classList = "dcmax_address";
+    newElement.setAttribute("dcmax_address", address);
     newElement.appendChild(document.createTextNode(address));
     // Remove text at this specific position - .replace() would not as it could replace another occurence of this string
     node.textContent = `${node.textContent.slice(
@@ -223,7 +223,7 @@
   /**
    * Create an empty & invisible popup, completely separated from the current page to avoid style conflicts
    */
-  const boxId = "ct_popup_symbol";
+  const boxId = "dcmax_popup_symbol";
   const boxSelector = `#${boxId}`;
   const createSymbolPopup = async () => {
     const box = Boundary.createBox(boxId, "shadow");
@@ -237,7 +237,7 @@
   };
   createSymbolPopup();
 
-  const addressBoxId = "ct_popup_address";
+  const addressBoxId = "dcmax_popup_address";
   const addressBoxSelector = `#${addressBoxId}`;
   const createAddressPopup = async () => {
     const box = Boundary.createBox(addressBoxId, "shadow");
@@ -257,7 +257,7 @@
       data: { coinId },
     });
     console.info(
-      "CryptoTracker - displaying coin informations : ",
+      "Decrypt-o-max - displaying coin informations : ",
       coinId,
       coinInformations
     );
@@ -265,74 +265,74 @@
       return;
     }
     // Name & description
-    Boundary.rewrite("#ct_coin_name", coinInformations.name);
-    Boundary.find("#ct_coin_name").attr("title", coinInformations.name);
-    Boundary.rewrite("#ct_coin_symbol", "(" + coinInformations.symbol + ")");
+    Boundary.rewrite("#dcmax_coin_name", coinInformations.name);
+    Boundary.find("#dcmax_coin_name").attr("title", coinInformations.name);
+    Boundary.rewrite("#dcmax_coin_symbol", "(" + coinInformations.symbol + ")");
     const description = $($.parseHTML(coinInformations.description.en)).text();
-    Boundary.rewrite("#ct_coin_description", description);
-    Boundary.find("#ct_coin_description").attr("title", description);
+    Boundary.rewrite("#dcmax_coin_description", description);
+    Boundary.find("#dcmax_coin_description").attr("title", description);
     // Price & market informations
     const currentPrice = coinInformations.market_data.current_price.usd;
     Boundary.rewrite(
-      "#ct_coin_current_price",
+      "#dcmax_coin_current_price",
       formatToUsd(currentPrice)
     );
     Boundary.rewrite(
-      "#ct_coin_change_24h",
+      "#dcmax_coin_change_24h",
       formatToUsPercent(
         coinInformations.market_data.price_change_percentage_24h
       )
     );
-    Boundary.find("#ct_coin_change_24h").css(
+    Boundary.find("#dcmax_coin_change_24h").css(
       "color",
       coinInformations.market_data.price_change_percentage_24h > 0
         ? "#7ab52b"
         : "#f44336"
     );
     Boundary.rewrite(
-      "#ct_coin_rank",
+      "#dcmax_coin_rank",
       coinInformations.market_data.market_cap_rank ? formatToUsNumber(coinInformations.market_data.market_cap_rank) : '-'
     );
     Boundary.rewrite(
-      "#ct_coin_marketcap",
+      "#dcmax_coin_marketcap",
       formatToUsd(coinInformations.market_data.market_cap.usd)
     );
     Boundary.rewrite(
-      "#ct_coin_ath",
+      "#dcmax_coin_ath",
       formatToUsd(coinInformations.market_data.ath.usd)
     );
     const changeAth = getPercentageChange(coinInformations.market_data.ath.usd, currentPrice) * -1;
     Boundary.rewrite(
-      "#ct_coin_change_ath",
+      "#dcmax_coin_change_ath",
       formatToUsPercent(changeAth)
     );
-    Boundary.find("#ct_coin_change_ath").css(
+    Boundary.find("#dcmax_coin_change_ath").css(
       "color", "#f44336"
     );
     Boundary.rewrite(
-      "#ct_coin_atl",
+      "#dcmax_coin_atl",
       formatToUsd(coinInformations.market_data.atl.usd)
     );
     const changeAtl = getPercentageChange(coinInformations.market_data.atl.usd, currentPrice) * -1;
     Boundary.rewrite(
-      "#ct_coin_change_atl",
+      "#dcmax_coin_change_atl",
       formatToUsPercent(changeAtl)
     );
-    Boundary.find("#ct_coin_change_atl").css(
+    Boundary.find("#dcmax_coin_change_atl").css(
       "color", "#7ab52b"
     );
     Boundary.rewrite(
-      "#ct_coin_24h_volume",
+      "#dcmax_coin_24h_volume",
       formatToUsd(coinInformations.market_data.total_volume.usd)
     );
     Boundary.rewrite(
-      "#ct_coin_current_supply",
+      "#dcmax_coin_current_supply",
       coinInformations.market_data.circulating_supply
         ? formatToUsNumber(coinInformations.market_data.circulating_supply)
         : "-"
     );
     Boundary.rewrite(
-      "#ct_coin_max_supply",
+      "#dcmax_coin_max_supply",
       coinInformations.market_data.total_supply ||
         coinInformations.market_data.max_supply
         ? formatToUsNumber(
@@ -347,47 +347,47 @@
         ? coinInformations.links.homepage[0]
         : null;
     if (homepage)
-      Boundary.find("#ct_link_homepage").attr("href", homepage).show();
-    else Boundary.find("#ct_link_homepage").hide();
+      Boundary.find("#dcmax_link_homepage").attr("href", homepage).show();
+    else Boundary.find("#dcmax_link_homepage").hide();
     const subreddit = coinInformations.links.subreddit_url || null;
     if (subreddit)
-      Boundary.find("#ct_link_reddit").attr("href", subreddit).show();
-    else Boundary.find("#ct_link_reddit").hide();
+      Boundary.find("#dcmax_link_reddit").attr("href", subreddit).show();
+    else Boundary.find("#dcmax_link_reddit").hide();
     const twitterHandle = coinInformations.links.twitter_screen_name || null;
     if (twitterHandle)
-      Boundary.find("#ct_link_twitter")
+      Boundary.find("#dcmax_link_twitter")
         .attr("href", "https://twitter.com/" + twitterHandle)
         .show();
-    else Boundary.find("#ct_link_twitter").hide();
+    else Boundary.find("#dcmax_link_twitter").hide();
     const facebookUsername = coinInformations.links.facebook_username || null;
     if (facebookUsername)
-      Boundary.find("#ct_link_facebook")
+      Boundary.find("#dcmax_link_facebook")
         .attr("href", "https://facebook.com/" + facebookUsername)
         .show();
-    else Boundary.find("#ct_link_facebook").hide();
+    else Boundary.find("#dcmax_link_facebook").hide();
     const telegramIdentifier =
       coinInformations.links.telegram_channel_identifier || null;
     if (telegramIdentifier)
-      Boundary.find("#ct_link_telegram")
+      Boundary.find("#dcmax_link_telegram")
         .attr("href", "https://t.me/" + telegramIdentifier)
         .show();
-    else Boundary.find("#ct_link_telegram").hide();
+    else Boundary.find("#dcmax_link_telegram").hide();
     const github =
       coinInformations.links.repos_url.github.length > 0
         ? coinInformations.links.repos_url.github[0]
         : null;
-    if (github) Boundary.find("#ct_link_github").attr("href", github).show();
-    else Boundary.find("#ct_link_github").hide();
-    Boundary.find("#ct_link_coinmarketcap")
+    if (github) Boundary.find("#dcmax_link_github").attr("href", github).show();
+    else Boundary.find("#dcmax_link_github").hide();
+    Boundary.find("#dcmax_link_coinmarketcap")
       .attr(
         "href",
         "https://coinmarketcap.com/currencies/" + coinInformations.id
       )
       .show();
-    Boundary.find("#ct_link_coingecko")
+    Boundary.find("#dcmax_link_coingecko")
       .attr("href", "https://www.coingecko.com/en/coins/" + coinInformations.id)
       .show();
-    Boundary.find("#ct_logo_coingecko")
+    Boundary.find("#dcmax_logo_coingecko")
       .attr("src", chrome.runtime.getURL("images/coingecko_logo.png"))
       .show();
     const explorer =
@@ -398,14 +398,14 @@
           ) || coinInformations.links.blockchain_site[0]
         : null;
     if (explorer)
-      Boundary.find("#ct_link_explorer").attr("href", explorer).show();
-    else Boundary.find("#ct_link_explorer").hide();
+      Boundary.find("#dcmax_link_explorer").attr("href", explorer).show();
+    else Boundary.find("#dcmax_link_explorer").hide();
     // Logo & images
     if (coinInformations.image.small) {
-      const logo = Boundary.find("#ct_coin_logo");
+      const logo = Boundary.find("#dcmax_coin_logo");
       logo.attr("src", coinInformations.image.small);
     }
-    const image = Boundary.find("#ct_market");
+    const image = Boundary.find("#dcmax_market");
     image.css(
       "background-image",
       "url(" + chrome.runtime.getURL("images/splash.jpg") + ")"
@@ -419,7 +419,7 @@
       data: { address },
     });
     console.info(
-      "CryptoTracker - displaying address informations : ",
+      "Decrypt-o-max - displaying address informations : ",
       address,
       addressInformations
     );
@@ -428,22 +428,22 @@
     }
     // Balance & transactions
     Boundary.rewrite(
-      "#ct_address",
+      "#dcmax_address",
       address
     );
     Boundary.rewrite(
-      "#ct_address_eth_balance",
+      "#dcmax_address_eth_balance",
       `${formatToUsNumber(addressInformations.ethBalance * 0.000000000000000001, 6)} ETH`
     );
     Boundary.rewrite(
-      "#ct_address_bsc_balance",
+      "#dcmax_address_bsc_balance",
       `${formatToUsNumber(addressInformations.bscBalance * 0.000000000000000001, 6)} BNB`
     );
     // Links, logos & social media
-    Boundary.find("#ct_logo_eth").attr("src", chrome.runtime.getURL("images/eth-diamond-purple.png")).show();
-    Boundary.find("#ct_logo_bnb").attr("src", chrome.runtime.getURL("images/binance-coin-bnb-logo.png")).show();
-    Boundary.find("#ct_link_etherscan").attr("href", `https://etherscan.io/address/${address}`).show();
-    Boundary.find("#ct_link_bscscan").attr("href", `https://bscscan.com/address/${address}`).show();
+    Boundary.find("#dcmax_logo_eth").attr("src", chrome.runtime.getURL("images/eth-diamond-purple.png")).show();
+    Boundary.find("#dcmax_logo_bnb").attr("src", chrome.runtime.getURL("images/binance-coin-bnb-logo.png")).show();
+    Boundary.find("#dcmax_link_etherscan").attr("href", `https://etherscan.io/address/${address}`).show();
+    Boundary.find("#dcmax_link_bscscan").attr("href", `https://bscscan.com/address/${address}`).show();
     return true;
   };
 
@@ -455,7 +455,7 @@
     // Display loading
     displayLoadingCursor(symbolNode);
     // Get coin id and populate popup based on these informations
-    const coinId = symbolNode.getAttribute("ct_coin_id");
+    const coinId = symbolNode.getAttribute("dcmax_coin_id");
     // Move it to the right location (bottom-right of the current node)
     const $el = $(symbolNode);
     const bottom = Math.min(
@@ -481,7 +481,7 @@
     // Display loading
     displayLoadingCursor(symbolNode);
     // Get coin id and populate popup based on these informations
-    const address = symbolNode.getAttribute("ct_address");
+    const address = symbolNode.getAttribute("dcmax_address");
     // Move it to the right location (bottom-right of the current node)
     const $el = $(symbolNode);
     const bottom = Math.min(

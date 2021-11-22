@@ -1,6 +1,6 @@
 {
-  "name": "CryptoTracker",
-  "description": "Track any coin or address on the fly!",
+  "name": "Decrypt-o-max",
+  "description": "Display everything you need to know about a token, anywhere on the internet.",
   "version": "1.0",
   "manifest_version": 3,
   "background": {

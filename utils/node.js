@@ -12,10 +12,10 @@
 
 const isSymbolNode = (node) => {
  if (!node) return false;
- return Array.from(node.classList.values()).includes("ct_symbol");
+ return Array.from(node.classList.values()).includes("dcmax_symbol");
 };
 
 const isAddressNode = (node) => {
  if (!node) return false;
- return Array.from(node.classList.values()).includes("ct_address");
+ return Array.from(node.classList.values()).includes("dcmax_address");
 };
