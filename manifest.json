@@ -53,7 +53,9 @@
       "32": "/images/logo-32.png",
       "48": "/images/logo-64.png",
       "128": "/images/logo-128.png"
-    }
+    },
+    "default_popup": "options.html",
+    "default_title": "Press Ctrl(Win)/Command(Mac)+Shift+Right/Left to flip tabs"
   },
   "icons": {
     "16": "/images/logo-16.png",

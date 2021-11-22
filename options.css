@@ -1,0 +1,17 @@
+body {
+  box-shadow: 0 15px 30px 1px grey;
+  background: rgba(255, 255, 255);
+  overflow: hidden;
+  margin: 0;
+  padding: 15px;
+  
+  font-family: "EB Garamond", serif;
+  text-align: center;
+  font-size: 17px;
+  color: #7d7d7d;
+}
+
+table {
+  text-align: left;
+  white-space: nowrap;
+}
