@@ -5,7 +5,7 @@ body {
   margin: 0;
   padding: 15px;
   
-  font-family: "EB Garamond", serif;
+  font-family: Helvetica, sans-serif;
   text-align: center;
   font-size: 17px;
   color: #7d7d7d;
@@ -14,4 +14,12 @@ body {
 table {
   text-align: left;
   white-space: nowrap;
+}
+
+table tr td:first-of-type {
+  font-weight: bold;
+}
+
+table tr td:last-of-type {
+  font-weight: lighter;
 }

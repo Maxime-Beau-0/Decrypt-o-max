@@ -45,11 +45,11 @@ body.waiting * {
 }
 
 #container h1 {
-  font-family: "Bebas Neue", cursive;
+  font-family: Helvetica, sans-serif;
   display: inline-block;
   position: relative;
   max-width: 260px;
-  font-size: 30px;
+  font-size: 28px;
   margin: 0;
   margin-left: 5px;
   white-space: nowrap;
@@ -58,7 +58,7 @@ body.waiting * {
 }
 
 #container .product-details span.coin-symbol {
-  font-family: "Bebas Neue", cursive;
+  font-family: Helvetica, sans-serif;
   display: inline-block;
   position: relative;
   font-size: 14px;
@@ -68,15 +68,15 @@ body.waiting * {
 }
 
 #container .product-details > p {
-  font-family: "EB Garamond", serif;
+  font-family: Helvetica, sans-serif;
   text-align: center;
   font-size: 17px;
   color: #7d7d7d;
   display: -webkit-box;
-  -webkit-line-clamp: 8;
+  -webkit-line-clamp: 9;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  height: 176px;
+  height: 180px;
   margin: 10px 0 0 0;
 }
 
@@ -103,7 +103,7 @@ body.waiting * {
 }
 
 .price-container {
-  font-family: "Farsan", cursive;
+  font-family: Helvetica, sans-serif;
   display: inline-block;
   position: relative;
   width: 100%;
@@ -113,7 +113,7 @@ body.waiting * {
 }
 
 .price-container span {
-  font-family: "Bebas Neue", cursive;
+  font-family: Helvetica, sans-serif;
   display: inline-block;
   position: relative;
   font-size: 30px;
@@ -122,7 +122,7 @@ body.waiting * {
 }
 
 .price-container .price-change, .price-change {
-  font-family: "Bebas Neue", cursive;
+  font-family: Helvetica, sans-serif;
   display: inline-block;
   position: relative;
   font-size: 14px;
@@ -136,9 +136,9 @@ body.waiting * {
 */
 
 .market {
-  font-family: "EB Garamond", serif;
+  font-family: Helvetica, sans-serif;
   text-align: center;
-  font-size: 18px;
+  font-size: 16px;
   color: #d8d8d8;
   transition: all 0.3s ease-out;
   position: relative;
@@ -184,7 +184,7 @@ body.waiting * {
   display:flex;
   flex-direction: row;
   justify-content: flex-start;
-  height: 300px;
+  height: 280px;
 }
 
 #container .market .market-informations .col {
@@ -207,6 +207,7 @@ body.waiting * {
 }
 #container .market .market-informations .col .cell {
   border-bottom: 1px solid #7d7d7d7d;
+  white-space: nowrap;
 }
 #container .market .market-informations .col .cell:last-of-type {
   border-bottom: none;
@@ -219,7 +220,7 @@ body.waiting * {
 /**
 .info {
   background: rgba(27, 26, 26, 0.9);
-  font-family: "Bree Serif", serif;
+  font-family: Helvetica, sans-serif;
   transition: all 0.3s ease-out;
   transform: translateX(-100%);
   position: absolute;

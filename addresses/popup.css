@@ -29,8 +29,12 @@ body.waiting * {
   display: flex;
 }
 
+#container .info-container h1 {
+  font-size: 13px;
+}
+
 #container h1 {
-  font-family: "Bebas Neue", cursive;
+  font-family: Helvetica, sans-serif;
   display: inline-block;
   position: relative;
   max-width: 320px;
@@ -64,7 +68,7 @@ body.waiting * {
 }
 
 .price-container {
-  font-family: "Farsan", cursive;
+  font-family: Helvetica, sans-serif;
   display: flex;
   position: relative;
   width: 100%;
@@ -74,7 +78,7 @@ body.waiting * {
 }
 
 .price-container span {
-  font-family: "Bebas Neue", cursive;
+  font-family: Helvetica, sans-serif;
   display: inline-block;
   position: relative;
   font-size: 19px;
