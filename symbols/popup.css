@@ -51,6 +51,7 @@ body.waiting * {
   max-width: 260px;
   font-size: 28px;
   margin: 0;
+  margin-top: 5px;
   margin-left: 5px;
   white-space: nowrap;
   text-overflow: ellipsis;
