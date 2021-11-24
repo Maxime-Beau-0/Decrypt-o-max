@@ -94,11 +94,14 @@ body.waiting * {
   width: 30px;
   height: 30px;
   text-align: center;
+  filter: invert(50%) sepia(10%) saturate(8%) hue-rotate(317deg) brightness(95%) contrast(85%);
 }
+
 #container .product-details .social-media a:hover {
   color: hsl(106, 53%, 51%);
   opacity: 0.6;
   transition: 0.3s;
+  filter: invert(61%) sepia(99%) saturate(322%) hue-rotate(60deg) brightness(90%) contrast(87%);
 }
 
 .price-container {
@@ -159,7 +162,7 @@ body.waiting * {
   text-align: center;
 }
 #container .market a:hover {
-  color: hsl(106, 53%, 51%);;
+  color: hsl(106, 52%, 51%);;
   opacity: 0.6;
   transition: 0.3s;
 }
@@ -177,6 +180,10 @@ body.waiting * {
   position: absolute;
   bottom: 20px;
   right: 60px;
+  filter: invert(85%) sepia(0%) saturate(1%) hue-rotate(41deg) brightness(103%) contrast(94%);
+}
+#container .market a.link-explorer:hover {
+  filter: invert(61%) sepia(99%) saturate(322%) hue-rotate(60deg) brightness(90%) contrast(87%);
 }
 
 #container .market .market-informations {

@@ -25,6 +25,7 @@ body.waiting * {
 
 #container .info-container {
   display: flex;
+  height: 24px;
 }
 
 #container .info-container h1 {
@@ -36,11 +37,12 @@ body.waiting * {
   display: inline-block;
   position: relative;
   max-width: 320px;
-  font-size: 19px;
+  font-size: 16px;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   margin: 0px;
+  margin-top: 5px;
 }
 
 #container .social-media {
@@ -79,8 +81,9 @@ body.waiting * {
   font-family: Helvetica, sans-serif;
   display: inline-block;
   position: relative;
-  font-size: 19px;
+  font-size: 16px;
   opacity: 0.6;
+  margin-top: 5px;
 }
 
 .price-container .logo-container {
