@@ -32,21 +32,32 @@ const fetchCoin = async (coinId) => {
   }
 };
 
-const fetchEthAddress = async (address) => {
-  console.info(`Fetching address ${address} from etherscan & bscscan api...`);
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+const fetchEthAddress = async (address, recursion = false) => {
+  console.info(`Decrypt-o-max : Fetching address ${address} from etherscan & bscscan api...`);
   
   const urlBalanceEth = `https://api.etherscan.io/api?module=account&action=balance&address=${address}&tag=latest`;
   // const urlTransactionsEth = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc`;
   const urlBalanceBsc = `https://api.bscscan.com/api?module=account&action=balance&address=${address}&tag=latest`;
   try {
-    const responseEth = await fetch(urlBalanceEth);
+    const responseEth = await fetch(urlBalanceEth)
+    await sleep(250);
+    const responseBsc = await fetch(urlBalanceBsc);
+    // Parse responses
     const responseTextEth = await responseEth.text();
     const dataEth = JSON.parse(responseTextEth);
-    const responseBsc = await fetch(urlBalanceBsc);
     const responseTextBsc = await responseBsc.text();
     const dataBsc = JSON.parse(responseTextBsc);
+    console.log('dataBsc', dataBsc, 'dataEth', dataEth)
     if(dataEth.status !== "1" || dataBsc.status !== "1") {
-      throw new Error('Api rate exceeded');
+      if(recursion) {
+        throw new Error('Api rate exceeded');
+      }
+      console.info('Decrypt-o-max : Api rate exceeded, waiting 5 seconds before resuming...');
+      await sleep(5000);
+      return fetchEthAddress(address, true);
     }
     return {
       bscBalance: dataBsc.result,
