@@ -356,7 +356,7 @@
     else Boundary.find("#dcmax_link_homepage").hide();
 
     const subreddit = coinInformations.links.subreddit_url || null;
-    if (subreddit) {
+    if (subreddit && subreddit !== "https://www.reddit.com") {
       Boundary.find("#dcmax_link_reddit").attr("href", subreddit).show();
       Boundary.find("#dcmax_logo_reddit")
         .attr("src", chrome.runtime.getURL("images/icons/reddit-alien.svg"))
