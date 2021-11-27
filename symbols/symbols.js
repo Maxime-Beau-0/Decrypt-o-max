@@ -3,11 +3,12 @@
   const coins = (await fetchTopic("coins")).filter(
     (coin) => coin.symbol !== '' && coin.name !== '' && !coin.id.startsWith("binance-peg")
   );
-  const regexps = [];
+  let regexps = [];
   // List of names then list of symbols
   let searchTerms = coins.map((coin) => escapeRegExp(coin.name.toLowerCase()));
   searchTerms.push(...coins.map((coin) => escapeRegExp(coin.symbol.toLowerCase())));
   const uniqueSearchTerms = [...new Set(searchTerms)];
+  uniqueSearchTerms.reverse(); // This reverse is important, otherwise coins like "Ethereum name service" don't work
   // Create an array of regexps from our search terms
   for (let i = 0; i < uniqueSearchTerms.length; i += 2000) {
     regexps.push(
@@ -181,7 +182,6 @@
       
       // Get all eth addresses in this node's text
       const ethMatches = Array.from(node.textContent.matchAll(regexpEth));
-      console.log('ethMatches', ethMatches, node.textContent, regexpEth);
       // Iterate in reverse order (terms at the end of the node first)
       // because we're going to split the current node on each iteration, and only keep the beginning
       for (const match of ethMatches.sort((match1, match2) =>
