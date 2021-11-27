@@ -1,7 +1,7 @@
 (async () => {
   // Get all coins & create regexp from it
   const coins = (await fetchTopic("coins")).filter(
-    (coin) => coin.symbol !== '' && coin.name !== '' && !coin.id.startsWith("binance-peg")
+    (coin) => coin.symbol !== '' && coin.name !== '' && !coin.id.startsWith("binance-peg") && coin.symbol !== "dogecoin"
   );
   let regexps = [];
   // List of names then list of symbols
@@ -30,7 +30,17 @@
       contracts.set(contractAddress.toLowerCase(), coin.symbol);
     }
   }
-  const regexpContracts = new RegExp(`\\b(${Array.from(contracts.keys()).map(contract => contract.toLowerCase()).join('|')})\\b`, 'gmi');
+  const contractAddresses = Array.from(contracts.keys()).map(contract => contract.toLowerCase());
+  const regexpsContracts = [];
+  for (let i = 0; i < contractAddresses.length; i += 500) {
+    regexpsContracts.push(
+      new RegExp(
+        `\\b(${contractAddresses.slice(i, i + 500).join("|")})\\b`,
+        "gmi"
+      )
+    );
+  }
+  const shortestContractLength = contractAddresses.reduce((a, b) => a.length <= b.length ? a.length : b.length);
 
   /**
    * Method used to surround a "text" at "index" in "node" with a span element
@@ -138,15 +148,20 @@
    * @param {*} parentNode node to traverse
    * @returns number of coins found
    */
-  const traverseNode = (parentNode) => {
-    let nodesAffected = [];
+  const traverseNode = async (parentNode) => {
+    if(!parentNode.matches(':hover')) {
+      return;
+    }
     for (let i = parentNode.childNodes.length - 1; i >= 0; i--) {
       const node = parentNode.childNodes[i];
       if (!isTextNode(node)) {
         if (node.nodeType == Element.ELEMENT_NODE) {
           //  Check this node's child nodes for text nodes to act on
-          nodesAffected.push(...traverseNode(node));
+          traverseNode(node);
         }
+        continue;
+      }
+      if(node.textContent === "") {
         continue;
       }
       // Get all names & symbols in this node's text
@@ -169,56 +184,55 @@
           encompassingMatches.push(match);
         }
       }
-
       for (const match of encompassingMatches) {
         // Get useful variables
         const symbolFound = match[0];
         const index = match.index;
-        const addedNode = injectSpanAroundText(node, index, symbolFound);
-        if (addedNode) {
-          nodesAffected.push(addedNode);
-        }
+        injectSpanAroundText(node, index, symbolFound);
       }
-      
-      // Get all eth addresses in this node's text
-      const ethMatches = Array.from(node.textContent.matchAll(regexpEth));
-      // Iterate in reverse order (terms at the end of the node first)
-      // because we're going to split the current node on each iteration, and only keep the beginning
-      for (const match of ethMatches.sort((match1, match2) =>
-        match1.index > match2.index ? -1 : 1
-      )) {
-        // Get useful variables
-        const addressFound = match[0];
-        const index = match.index;
-        // Check that this address is not a contract -> it will be handled differently
-        const symbolFromContract = contracts.get(addressFound.toLowerCase());
-        if(symbolFromContract) {
-          continue;
-        }
-        const addedNode = injectSpanAroundEthAddress(node, index, addressFound);
-        if (addedNode) {
-          nodesAffected.push(addedNode);
+
+      if(node.textContent.length >= 42) {
+        // Get all eth addresses in this node's text
+        const ethMatches = Array.from(node.textContent.matchAll(regexpEth));
+        // Iterate in reverse order (terms at the end of the node first)
+        // because we're going to split the current node on each iteration, and only keep the beginning
+        for (const match of ethMatches.sort((match1, match2) =>
+          match1.index > match2.index ? -1 : 1
+        )) {
+          // Get useful variables
+          const addressFound = match[0];
+          const index = match.index;
+          // Check that this address is not a contract -> it will be handled differently
+          const symbolFromContract = contracts.get(addressFound.toLowerCase());
+          if(symbolFromContract) {
+            continue;
+          }
+          injectSpanAroundEthAddress(node, index, addressFound);
         }
       }
 
-      // Get all contracts in this node's text
-      const contractsMatches = Array.from(node.textContent.matchAll(regexpContracts));
-      // Iterate in reverse order (terms at the end of the node first)
-      // because we're going to split the current node on each iteration, and only keep the beginning
-      for (const match of contractsMatches.sort((match1, match2) =>
-        match1.index > match2.index ? -1 : 1
-      )) {
-        // Get useful variables
-        const addressFound = match[0];
-        const index = match.index;
-        // Check that this address is not a contract -> it will be handled differently
-        const addedNode = injectSpanAroundContractAddress(node, index, addressFound);
-        if (addedNode) {
-          nodesAffected.push(addedNode);
+      if(node.textContent.length >= shortestContractLength) {
+        // Get all contracts in this node's text
+        let contractsMatches = [];
+        for (const regexp of regexpsContracts) {
+          contractsMatches.push(...Array.from(node.textContent.matchAll(regexp)));
+        }
+        // Iterate in reverse order (terms at the end of the node first)
+        // because we're going to split the current node on each iteration, and only keep the beginning
+        contractsMatches.sort((match1, match2) =>
+          match1.index > match2.index ? -1 : 1
+        );
+        // Iterate in reverse order (terms at the end of the node first)
+        // because we're going to split the current node on each iteration, and only keep the beginning
+        for (const match of contractsMatches) {
+          // Get useful variables
+          const addressFound = match[0];
+          const index = match.index;
+          // Check that this address is not a contract -> it will be handled differently
+          injectSpanAroundContractAddress(node, index, addressFound);
         }
       }
     }
-    return nodesAffected;
   };
 
   /**
