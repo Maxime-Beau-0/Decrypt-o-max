@@ -286,6 +286,11 @@
     const description = $($.parseHTML(coinInformations.description.en)).text();
     Boundary.rewrite("#dcmax_coin_description", description);
     Boundary.find("#dcmax_coin_description").attr("title", description);
+    let creationDate = coinInformations.genesis_date;
+    if(!creationDate) {
+      creationDate = coinInformations.ico_data && coinInformations.ico_data.ico_start_date ? coinInformations.ico_data.ico_start_date.split('T')[0] : '-';
+    }
+    Boundary.rewrite("#dcmax_coin_creation", creationDate);
     // Price & market informations
     const currentPrice = coinInformations.market_data.current_price.usd;
     Boundary.rewrite(
@@ -306,7 +311,7 @@
     );
     Boundary.rewrite(
       "#dcmax_coin_rank",
-      coinInformations.market_data.market_cap_rank ? formatToUsNumber(coinInformations.market_data.market_cap_rank) : '-'
+      coinInformations.market_data.market_cap_rank ? formatToUsNumber(coinInformations.market_data.market_cap_rank) : coinInformations.coingecko_rank ? formatToUsNumber(coinInformations.coingecko_rank) : '-'
     );
     Boundary.rewrite(
       "#dcmax_coin_marketcap",
