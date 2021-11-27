@@ -241,7 +241,7 @@
   const boxId = "dcmax_popup_symbol";
   const boxSelector = `#${boxId}`;
   const createSymbolPopup = async () => {
-    const box = Boundary.createBox(boxId, "shadow");
+    Boundary.createBox(boxId, "dcmax-shadow");
     Boundary.loadBoxCSS(
       boxSelector,
       chrome.runtime.getURL("symbols/popup.css")
@@ -255,7 +255,7 @@
   const addressBoxId = "dcmax_popup_address";
   const addressBoxSelector = `#${addressBoxId}`;
   const createAddressPopup = async () => {
-    const box = Boundary.createBox(addressBoxId, "shadow");
+    Boundary.createBox(addressBoxId, "dcmax-shadow");
     Boundary.loadBoxCSS(
       addressBoxSelector,
       chrome.runtime.getURL("addresses/popup.css")
@@ -460,6 +460,8 @@
       "background-image",
       "url(" + chrome.runtime.getURL("images/splash.jpg") + ")"
     );
+
+    $('body').on("click", hidePopup);
     return true;
   };
 
@@ -494,6 +496,8 @@
     Boundary.find("#dcmax_logo_bnb").attr("src", chrome.runtime.getURL("images/icons/binance-coin-bnb-logo.png")).show();
     Boundary.find("#dcmax_link_etherscan").attr("href", `https://etherscan.io/address/${address}`).show();
     Boundary.find("#dcmax_link_bscscan").attr("href", `https://bscscan.com/address/${address}`).show();
+
+    $('body').on("click", hidePopup);
     return true;
   };
 

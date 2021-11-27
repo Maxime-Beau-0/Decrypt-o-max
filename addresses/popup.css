@@ -9,6 +9,7 @@ body.waiting * {
 }
 
 #container {
+  font-family: American Typewriter, serif;
   box-shadow: 0 15px 30px 1px grey;
   background: rgba(255, 255, 255, 0.9);
   text-align: left;
@@ -29,11 +30,10 @@ body.waiting * {
 }
 
 #container .info-container h1 {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 #container h1 {
-  font-family: Helvetica, sans-serif;
   display: inline-block;
   position: relative;
   max-width: 320px;
@@ -68,7 +68,6 @@ body.waiting * {
 }
 
 .price-container {
-  font-family: Helvetica, sans-serif;
   display: flex;
   position: relative;
   width: 100%;
@@ -78,7 +77,6 @@ body.waiting * {
 }
 
 .price-container span {
-  font-family: Helvetica, sans-serif;
   display: inline-block;
   position: relative;
   font-size: 16px;
