@@ -567,7 +567,7 @@
   $(document).on("keydown", async (e) => {
     if (e.which == 27) {
       hidePopup();
-    } else if (e.which == 84) {
+    } else if (e.which == 104 || e.which == 72) {
       hidePopup();
       const hoveredNodes = document.querySelectorAll(":hover");
       const elementHovered = Array.from(hoveredNodes.values()).pop();
