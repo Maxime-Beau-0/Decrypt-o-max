@@ -1,17 +1,15 @@
 {
   "name": "Decrypt-o-max",
-  "description": "Display everything you need to know about a token, anywhere on the internet.",
-  "version": "1.0",
+  "description": "Display everything you need to know about a token, all in under a second.",
+  "version": "1.0.1",
+  
   "manifest_version": 3,
+
   "background": {
     "service_worker": "background.js"
   },
-
-  "permissions": ["activeTab", "declarativeContent", "storage"],
-  "host_permissions": ["https://api.coingecko.com/api/v3/*"],
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
       "css": ["libs/boundary/boundary.css", "symbols/container.css", "symbols/symbols.css"],
       "js": [
         "libs/boundary/jquery.js",
@@ -24,12 +22,15 @@
         "utils/regexp.js",
         "symbols/symbols.js"
       ],
+      "matches": ["http://*/*", "https://*/*"],
       "run_at": "document_end"
     }
   ],
+  "permissions": ["storage"],
 
   "web_accessible_resources": [
     {
+      "matches": ["http://*/*", "https://*/*"],
       "resources": [
         "images/icons/*",
         "images/splash.jpg",
@@ -38,8 +39,7 @@
         "addresses/popup.html",
         "symbols/popup.css",
         "symbols/popup.html"
-      ],
-      "matches": ["http://*/*", "https://*/*"]
+      ]
     }
   ],
 
