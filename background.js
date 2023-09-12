@@ -88,3 +88,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   return true; // Important to return true when async, see https://stackoverflow.com/a/56483156
 });
+
+const openPopup = async (selectionContext) => {
+  // chrome.tabs.create({url: "https://coinmarketcap.com/fr/currencies/" + symbol});
+  chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, {action: "display_popup", symbol: selectionContext.selectionText}).catch(e => console.error('Extension decrypt-o-max error in fetchCoins : ', e));
+  });
+};
+
+chrome.contextMenus.create({
+  id: "decrypt-o-max",
+  title: "Informations",
+  contexts:["selection", "page", "link"],
+}, chrome.contextMenus.onClicked.addListener(openPopup));

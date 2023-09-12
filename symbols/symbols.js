@@ -146,7 +146,7 @@
   /**
    * Go through a node & its children (recursively) & inject an html element around all coins found in text nodes
    * @param {*} parentNode node to traverse
-   * @returns number of coins found
+   * @returns
    */
   const traverseNode = async (parentNode) => {
     if(!parentNode.matches(':hover')) {
@@ -506,7 +506,56 @@
     return true;
   };
 
-  const displayPopup = async (symbolNode) => {
+  
+  const display = async () => {
+    const hoveredNodes = contextMenuInformations?.hoveredNodes || document.querySelectorAll(":hhover");
+    const elementHovered = Array.from(hoveredNodes.values()).pop();
+    // If it's a symbol node, display popup. Otherwise traverse it to add symbol nodes just in case
+    if (isSymbolNode(elementHovered)) {
+      displayCoinPopup(elementHovered);
+      contextMenuInformations = null;
+      return;
+    }
+    if (isAddressNode(elementHovered)) {
+      displayAddressPopup(elementHovered);
+      contextMenuInformations = null;
+      return;
+    }
+    displayLoadingCursor(elementHovered);
+    // Traverse node & wait until nodes are added to DOM, and display popup if it's hovered (or we right clicked on it)
+    const observer = new MutationObserver(((contextMenuInformations) => (mutations) => {
+      for (const mutation of mutations) {
+        if (!mutation.addedNodes) continue;
+        // .querySelectorAll with hover would not be refreshed yet & no event can be catch, wait 10ms... no other solution found
+        setTimeout(() => {
+          const hoveredNodes = contextMenuInformations ? document.elementsFromPoint(contextMenuInformations.x, contextMenuInformations.y).reverse() : document.querySelectorAll(":hover");
+          const elementHovered = Array.from(hoveredNodes.values()).pop();
+          if (isSymbolNode(elementHovered)) {
+            displayCoinPopup(elementHovered);
+          }
+          if (isAddressNode(elementHovered)) {
+            displayAddressPopup(elementHovered);
+          }
+        }, 10);
+        break;
+      }
+      hideLoadingCursor(elementHovered);
+    })(contextMenuInformations));
+    observer.observe(elementHovered, {
+      childList: true,
+      subtree: true,
+      attributes: false,
+    });
+    traverseNode(elementHovered);
+    // Stop observing after 500ms to avoid displaying a popup too late
+    setTimeout(() => {
+      observer.disconnect();
+      hideLoadingCursor(elementHovered);
+    }, 500);
+    contextMenuInformations = null;
+  }
+
+  const displayCoinPopup = async (symbolNode) => {
     if (!isSymbolNode(symbolNode)) {
       console.warn("Trying to display popup on a non-symbol node...");
       return;
@@ -569,48 +618,28 @@
       hidePopup();
     } else if (e.which == 104 || e.which == 72) {
       hidePopup();
-      const hoveredNodes = document.querySelectorAll(":hover");
-      const elementHovered = Array.from(hoveredNodes.values()).pop();
-      // If it's a symbol node, display popup. Otherwise traverse it to add symbol nodes just in case
-      if (isSymbolNode(elementHovered)) {
-        displayPopup(elementHovered);
-        return;
-      }
-      if (isAddressNode(elementHovered)) {
-        displayAddressPopup(elementHovered);
-        return;
-      }
-      displayLoadingCursor(elementHovered);
-      // Traverse node & wait until nodes are added to DOM, and display popup if it's hovered
-      const observer = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-          if (!mutation.addedNodes) continue;
-          // .querySelectorAll with hover would not be refreshed yet & no event can be catch, wait 10ms... no other solution found
-          setTimeout(() => {
-            const hoveredNodes = document.querySelectorAll(":hover");
-            const elementHovered = Array.from(hoveredNodes.values()).pop();
-            if (isSymbolNode(elementHovered)) {
-              displayPopup(elementHovered);
-            }
-            if (isAddressNode(elementHovered)) {
-              displayAddressPopup(elementHovered);
-            }
-          }, 10);
-          break;
-        }
-        hideLoadingCursor(elementHovered);
-      });
-      observer.observe(elementHovered, {
-        childList: true,
-        subtree: true,
-        attributes: false,
-      });
-      traverseNode(elementHovered);
-      // Stop observing after 500ms to avoid displaying a popup too late
-      setTimeout(() => {
-        observer.disconnect();
-        hideLoadingCursor(elementHovered);
-      }, 500);
+      display();
+    }
+  });
+
+  /**
+   * Right click methods, used when a user open the context menu and click on our link
+   * We need to save x & y position of the mouse to re-compute hovered element after we populate the DOM
+   */
+  let contextMenuInformations = null;
+  $(document).on("contextmenu", async (e) => {
+    contextMenuInformations = {
+      hoveredNodes: document.elementsFromPoint(e.clientX, e.clientY).reverse(),
+      target: e.target,
+      x: e.clientX,
+      y: e.clientY
+    }
+  });
+
+  chrome.runtime.onMessage.addListener((message) => {
+    if(message.action === "display_popup") {
+      hidePopup();
+      display();
     }
   });
 })();
