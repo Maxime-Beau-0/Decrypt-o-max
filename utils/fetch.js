@@ -13,7 +13,7 @@ const fetchTopic = async (topic, options) => {
       console.info("Extension : Fetched from cache - ", topicInStorage);
       return resolve(topicInStorage);
     }
-    console.info("Extension : Fetching topic, not using cache - ", topic);
+    console.info("Extension : Fetching topic, not using cache - topic = ", topic);
     chrome.runtime.sendMessage({ topic, data }, (messageResponse) => {
       if (messageResponse === null || messageResponse === undefined) {
         reject(new Error(`Error fetching topic - ${topic}`));
