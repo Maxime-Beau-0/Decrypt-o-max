@@ -508,7 +508,7 @@
 
   
   const display = async () => {
-    const hoveredNodes = contextMenuInformations?.hoveredNodes || document.querySelectorAll(":hhover");
+    const hoveredNodes = contextMenuInformations?.hoveredNodes || document.querySelectorAll(":hover");
     const elementHovered = Array.from(hoveredNodes.values()).pop();
     // If it's a symbol node, display popup. Otherwise traverse it to add symbol nodes just in case
     if (isSymbolNode(elementHovered)) {
